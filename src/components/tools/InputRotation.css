@@ -1,0 +1,64 @@
+
+.InputRotation{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  & .btn-rotate{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: #222222;
+
+    & .icon-rotate{
+      color: #4ebf71;
+    }
+
+    &:hover{
+      cursor: pointer;
+    }
+
+    &:hover .icon-rotate{
+      color: #68ff96;
+    }
+  }
+
+  & .input-rotate{
+    display: flex;
+    flex-direction: row;
+    text-align:right; 
+    border: none;
+    height: 25px;
+    width: 50px;
+    color: white;
+    background-color: #2f2f2f;
+  }
+
+  & .input-rotate::-webkit-outer-spin-button,
+  .input-rotate::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.btnExport{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  color: #222222;
+  gap: 2px;
+  border: none;
+  margin-right: 5px;
+  padding: 5px 10px 5px 10px;
+  background-color: #4ebf71;
+
+  &:hover{
+    background-color: #68ff96;
+    cursor: pointer;
+  }
+}

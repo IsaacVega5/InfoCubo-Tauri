@@ -1,0 +1,58 @@
+.check-input{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  font-size: .8rem;
+
+  & span{
+    display: flex;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    line-height: 15px;
+    vertical-align: center;
+  }
+}
+
+.check-input[active='false']{
+  color: #b4b4b4;
+  pointer-events: none;
+  opacity: .5;
+
+  & .check-box{
+    background-color: #2f2f2f;
+    color: #b4b4b4;
+  }
+}
+
+.check-box{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  background-color: #2f2f2f;
+  border: none;
+  cursor: pointer;
+  padding: 0px;
+  padding-left: 1px;
+  font-size: .8rem;
+
+  & .icon{
+    opacity: 0;
+    scale: 0.5;
+    transition: scale 0.1s, opacity 0.1s;
+  }
+}
+.check-box.checked{
+  background-color: #4ebf71;
+  color: white;
+  
+  & .icon{
+    scale: 1;
+    opacity: 1;
+  }
+}

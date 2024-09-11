@@ -1,0 +1,28 @@
+.IconBtn{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  color: #222222;
+  gap: 5px;
+  border: none;
+  line-height: 25px;
+  background-color: #4ebf71;
+  border: 2px solid #4ebf71;
+
+  &:hover{
+    background-color: #68ff96;
+    border-color: #68ff96;
+    cursor: pointer;
+  }
+}
+
+.IconBtn[data-filled = false]{
+  background-color: #222222;
+  color: #4ebf71;
+}
+.IconBtn[data-filled = false]:hover{
+  background-color: #222222;
+  color: #68ff96;
+}

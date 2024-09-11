@@ -1,0 +1,43 @@
+.ChannelHistogram{
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  color: white;
+  background-color: #222222;
+
+  & .header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #2f2f2f;
+
+    & button{
+      height: 25px;
+      background-color: transparent;
+      border: none;
+      color: #4ebf71;
+      font-size: 20px;
+      transition: .2s;
+      
+      &:hover{
+        color: #68ff96;
+        cursor: pointer;
+      }
+    }
+  }
+
+  & .recharts-default-tooltip{
+    background-color: #222222 !important;
+    color: #4ebf71 !important;
+    opacity: 0.9;
+    border: none !important;
+    
+
+    & ul span{
+      color: #4ebf71 !important;
+    }
+  }
+}
+

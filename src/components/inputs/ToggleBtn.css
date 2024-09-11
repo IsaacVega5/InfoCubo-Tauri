@@ -1,0 +1,43 @@
+.ToggleBtn-cont{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  font-size: .8rem;
+  font-weight: lighter;
+}
+
+.ToggleBtn{
+  display: flex;
+  position: relative;
+  width: 28px;
+  height: 16px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 15px;
+  border: .1rem solid white;
+  opacity: .8;
+  background-color: transparent;
+  margin: 2px;
+  cursor: pointer;
+  
+  & .tg-switch{
+    position: absolute;
+    height: 12px;
+    width: 14px;
+    background-color: white;
+    border-radius: 15px;
+    top: calc(50% - 6px);
+    left: calc(0% + 1px);
+    transition: all 0.1s;
+  }
+}
+.ToggleBtn[active="true"]{
+  background-color: #4ebf71;
+  border-color: #4ebf71;
+  opacity: 1;
+
+  & .tg-switch{
+    left: calc(100% - 15px);
+  }
+}
