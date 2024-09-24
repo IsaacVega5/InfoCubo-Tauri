@@ -24,7 +24,7 @@ export default function ImageViewer({loader, setLoader}) {
     try{
       if (hiperImgValues.channel == sliderValue) return
       setLoader(true)
-      const {url} = await getImgUrl({path: hiperImgValues.path, channel: sliderValue, rotation: toolsValues.rotationValue})
+      const {url} = await getImgUrl({path: hiperImgValues.path, channel: sliderValue, rotation: toolsValues.rotationValue, reshape:[200,100]})
       setHiperImgValues({...hiperImgValues, url: url, channel: sliderValue})
     }catch(err){
       console.error(err)
@@ -36,7 +36,7 @@ export default function ImageViewer({loader, setLoader}) {
     setLoader(true)
     try{
       
-      const {url, shape} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue})
+      const {url, shape} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[200,100]})
       
       setHiperImgValues({...hiperImgValues, url: url, shape: shape})
       

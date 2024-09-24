@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from services import hiper
+import json
 
 router = APIRouter(
   prefix="/envi",
@@ -10,6 +11,7 @@ router = APIRouter(
 
 @router.get("/")
 def read_envi(path, band, rotation=0, reshape=[None, None]):
+  reshape = json.loads(reshape)
   img, shape = hiper.read_envi(path, band, rotation, reshape)
   return StreamingResponse(img, media_type="image/png", headers={"X-shape": ",".join([str(i) for i in shape])})
   
