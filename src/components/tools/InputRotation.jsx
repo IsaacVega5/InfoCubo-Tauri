@@ -8,7 +8,7 @@ import { getImgUrl } from "../../services/hiper.js";
 import { useDebouncedCallback } from 'use-debounce'
 import { getElementShape } from "../../services/utils.js";
 
-export default function InputRotation() {
+export default function InputRotation({ setLoader }) {
   let { toolsValues, setToolsValues } = useContext(ToolsContext)
   const { hiperImgValues, setHiperImgValues } = useContext(HiperImgContext)
   let [rotation, setRotation] = useState(0)
@@ -66,11 +66,13 @@ export default function InputRotation() {
   }
 
   let rotateImage = async () => {
+    setLoader(true)
     setToolsValues({...toolsValues, rotationValue: rotation})
     if (hiperImgValues.path == "") return
     const {width, height} = getElementShape("img_cont")
     const {url, shape, resize} = await getImgUrl({path: hiperImgValues.path, channel: hiperImgValues.channel, rotation: rotation, reshape:[width,height]})
     setHiperImgValues({...hiperImgValues, url: url, shape: shape, resize: resize})
+    setLoader(false)
   }
 
   useEffect(() => {
