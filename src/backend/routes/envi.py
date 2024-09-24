@@ -9,8 +9,8 @@ router = APIRouter(
 )
 
 @router.get("/")
-def read_envi(path, band, rotation=0):
-  img, shape = hiper.read_envi(path, band, rotation)
+def read_envi(path, band, rotation=0, reshape=[None, None]):
+  img, shape = hiper.read_envi(path, band, rotation, reshape)
   return StreamingResponse(img, media_type="image/png", headers={"X-shape": ",".join([str(i) for i in shape])})
   
 @router.get("/info/")
