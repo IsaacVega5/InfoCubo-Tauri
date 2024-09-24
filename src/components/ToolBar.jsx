@@ -86,7 +86,7 @@ export default function ToolBar({setLoader}) {
   return (
     <div className='ToolBar'>
       <div className="tools">
-        <InputRotation/>
+        <InputRotation setLoader={setLoader}/>
         <CheckBtn value={toolsValues.pixelCheck} 
           title="Obtener información de un pixel"
           onChange={(value) => setToolsValues(prev => ({...prev, pixelCheck: value}))}>
