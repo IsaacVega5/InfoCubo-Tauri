@@ -69,8 +69,8 @@ export default function InputRotation() {
     setToolsValues({...toolsValues, rotationValue: rotation})
     if (hiperImgValues.path == "") return
     const {width, height} = getElementShape("img_cont")
-    const {url, shape} = await getImgUrl({path: hiperImgValues.path, channel: hiperImgValues.channel, rotation: rotation, reshape:[width,height]})
-    setHiperImgValues({...hiperImgValues, url: url, shape: shape})
+    const {url, shape, resize} = await getImgUrl({path: hiperImgValues.path, channel: hiperImgValues.channel, rotation: rotation, reshape:[width,height]})
+    setHiperImgValues({...hiperImgValues, url: url, shape: shape, resize: resize})
   }
 
   useEffect(() => {

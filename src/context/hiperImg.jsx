@@ -8,6 +8,7 @@ export function HiperImgProvider({ children }) {
     url:"",
     shape:[0, 0, 0],
     channel:0,
+    resize:1
   })
 
   return (

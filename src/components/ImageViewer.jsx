@@ -39,9 +39,9 @@ export default function ImageViewer({loader, setLoader}) {
     try{
       
       const {width, height} = getElementShape("img_cont")
-      const {url, shape} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
+      const {url, shape, resize} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
       
-      setHiperImgValues({...hiperImgValues, url: url, shape: shape})
+      setHiperImgValues({...hiperImgValues, url: url, shape: shape, resize: resize})
       
       let slider = document.getElementById("band_slider")
       slider.value = 0

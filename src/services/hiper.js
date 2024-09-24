@@ -18,7 +18,8 @@ export let getImgUrl = async ({path,channel=0,rotation=0, reshape=[null, null]})
   
   return {
     url: response.url,
-    shape: response.headers.get('X-shape').split(',')
+    shape: response.headers.get('X-shape').split(','),
+    resize: response.headers.get('X-resize')
   }
 }
 
