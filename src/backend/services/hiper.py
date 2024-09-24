@@ -19,7 +19,7 @@ def read_envi(path, band, rotation=0):
     return "error"
   
   banda = image.read_band(int(band))
-  
+  banda = ut.reshape_matrix(banda, 500,500) #<- Se redimensiona la matriz antes de normalizar y rotar
   banda = cv2.normalize(banda, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
   if rotation != 0:
     banda = tf.rotate_matrix(banda, float(rotation) *-1)
