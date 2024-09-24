@@ -10,6 +10,8 @@ import Points from './Points.jsx';
 import HistogramGroup from './windows/HistogramGroup.jsx';
 import toast from 'react-hot-toast';
 import { getElementShape } from '../services/utils.js';
+import { useOnResizeObserver } from '../hooks/useOnResizeObserver.jsx';
+import { useDebouncedCallback } from 'use-debounce'
 
 export default function ImageViewer({loader, setLoader}) {
   const {toolsValues, setToolsValues} = useContext(ToolsContext)
@@ -135,6 +137,15 @@ export default function ImageViewer({loader, setLoader}) {
 
     setLoader(false)
   }
+
+  const onResizeCanvas = async (width, height) => {
+    setLoader(true)
+    const {url, shape, resize} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
+    setHiperImgValues({...hiperImgValues, url: url, shape: shape, resize: resize})
+    setLoader(false)
+  }
+  const debounceOnResizeCanvas = useDebouncedCallback(onResizeCanvas, 500)
+  useOnResizeObserver({id: "img_cont", onResize: debounceOnResizeCanvas})
 
   return (
     <div id="ImageViewer" className="ImageViewer">
