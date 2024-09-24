@@ -6,6 +6,7 @@ import { ToolsContext } from "../../context/tools.jsx";
 import { HiperImgContext } from "../../context/hiperImg.jsx";
 import { getImgUrl } from "../../services/hiper.js";
 import { useDebouncedCallback } from 'use-debounce'
+import { getElementShape } from "../../services/utils.js";
 
 export default function InputRotation() {
   let { toolsValues, setToolsValues } = useContext(ToolsContext)
@@ -67,7 +68,8 @@ export default function InputRotation() {
   let rotateImage = async () => {
     setToolsValues({...toolsValues, rotationValue: rotation})
     if (hiperImgValues.path == "") return
-    const {url, shape} = await getImgUrl({path: hiperImgValues.path, channel: hiperImgValues.channel, rotation: rotation, reshape:[200,100]})
+    const {width, height} = getElementShape("img_cont")
+    const {url, shape} = await getImgUrl({path: hiperImgValues.path, channel: hiperImgValues.channel, rotation: rotation, reshape:[width,height]})
     setHiperImgValues({...hiperImgValues, url: url, shape: shape})
   }
 

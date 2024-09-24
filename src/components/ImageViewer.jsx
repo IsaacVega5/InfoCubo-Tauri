@@ -9,6 +9,7 @@ import Loader from './Loader.jsx';
 import Points from './Points.jsx';
 import HistogramGroup from './windows/HistogramGroup.jsx';
 import toast from 'react-hot-toast';
+import { getElementShape } from '../services/utils.js';
 
 export default function ImageViewer({loader, setLoader}) {
   const {toolsValues, setToolsValues} = useContext(ToolsContext)
@@ -24,7 +25,8 @@ export default function ImageViewer({loader, setLoader}) {
     try{
       if (hiperImgValues.channel == sliderValue) return
       setLoader(true)
-      const {url} = await getImgUrl({path: hiperImgValues.path, channel: sliderValue, rotation: toolsValues.rotationValue, reshape:[200,100]})
+      const {width, height} = getElementShape("img_cont")
+      const {url} = await getImgUrl({path: hiperImgValues.path, channel: sliderValue, rotation: toolsValues.rotationValue, reshape:[width,height]})
       setHiperImgValues({...hiperImgValues, url: url, channel: sliderValue})
     }catch(err){
       console.error(err)
@@ -36,7 +38,8 @@ export default function ImageViewer({loader, setLoader}) {
     setLoader(true)
     try{
       
-      const {url, shape} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[200,100]})
+      const {width, height} = getElementShape("img_cont")
+      const {url, shape} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
       
       setHiperImgValues({...hiperImgValues, url: url, shape: shape})
       
