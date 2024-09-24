@@ -9,7 +9,7 @@ import os
 import pandas as pd
 import utils as ut
 
-def read_envi(path, band, rotation=0):
+def read_envi(path, band, rotation=0, reshape=[None, None]):
   path = path.replace('"', "")
   image = path.replace('.hdr', "")
   file = path
@@ -19,6 +19,10 @@ def read_envi(path, band, rotation=0):
     return "error"
   
   banda = image.read_band(int(band))
+  resize_ratio = 1
+  if reshape != [None, None]:
+    new_width, new_height, resize_ratio = ut.get_new_size(banda, int(reshape[0]), int(reshape[1]))
+    banda = ut.reshape_matrix(banda, new_width, new_height)
   
   banda = cv2.normalize(banda, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
   if rotation != 0:
@@ -28,7 +32,7 @@ def read_envi(path, band, rotation=0):
   buffered = BytesIO()
   img.save(buffered, format="PNG")
   buffered.seek(0)
-  return buffered, (banda.shape[0], banda.shape[1], image.shape[2])
+  return buffered, (banda.shape[0], banda.shape[1], image.shape[2]), resize_ratio
 
 def read_envi_info(path):
   path = path.replace('"', "")

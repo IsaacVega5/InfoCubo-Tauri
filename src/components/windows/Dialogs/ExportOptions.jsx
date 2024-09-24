@@ -37,7 +37,14 @@ export default function ExportOptions({setLoader}) {
   ]
 
   const HandleExport = async () =>{
-    const name_cutPoints = (toolsValues.cutPoints[0] == null) ? 'NONE' : Math.floor(toolsValues.cutPoints[0].x) + '_' + Math.floor(toolsValues.cutPoints[0].y)
+    const resizedCutPoints = toolsValues.cutPoints.map(point => {
+      if (point == null) return null
+      return {
+        x: point.x / hiperImgValues.resize, 
+        y: point.y / hiperImgValues.resize
+      }
+    })
+    const name_cutPoints = (resizedCutPoints == null) ? 'NONE' : Math.floor(resizedCutPoints[0].x) + '_' + Math.floor(resizedCutPoints[0].y)
     const pathParts = hiperImgValues.path.split('\\');
     const fileName = pathParts.pop().split('.')[0] + '_rotated_'+toolsValues.rotationValue + '_cut_' + name_cutPoints;
     const path = pathParts.join('\\');
@@ -82,7 +89,7 @@ export default function ExportOptions({setLoader}) {
       imagePath: hiperImgValues.path,
       outputPath: filePath, 
       rotation: toolsValues.rotationValue,
-      cutPoints: JSON.stringify(toolsValues.cutPoints),
+      cutPoints: JSON.stringify(resizedCutPoints),
       metadata: keep.metadata,
       waves: keep.waves,
       channelRange: channelRange,

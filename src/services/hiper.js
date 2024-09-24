@@ -12,12 +12,14 @@ export let getPixelInfo = async ({path, x, y}) =>{
   }
 }
 
-export let getImgUrl = async ({path,channel=0,rotation=0}) =>{
-  const response = await fetch(`${BACKEND_URL}/?path="${path}"&band=${channel}&rotation=${rotation}`)
+export let getImgUrl = async ({path,channel=0,rotation=0, reshape=[null, null]}) =>{
+  reshape = JSON.stringify(reshape)
+  const response = await fetch(`${BACKEND_URL}/?path="${path}"&band=${channel}&rotation=${rotation}&reshape=${reshape}`)
   
   return {
     url: response.url,
-    shape: response.headers.get('X-shape').split(',')
+    shape: response.headers.get('X-shape').split(','),
+    resize: response.headers.get('X-resize')
   }
 }
 
