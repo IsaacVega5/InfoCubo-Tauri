@@ -30,19 +30,29 @@ fn start_backend(receiver: Receiver<i32>){
 }
 
 fn main() {
-	// Startup the python binary (api service)
-	let (tx,rx) = sync_channel(1);
-	start_backend(rx);
+	// Verifica si el entorno es de producción o de desarrollo
+	let is_production =  !cfg!(debug_assertions);
+	
+	if is_production == true {
+		// Startup the python binary (api service)
+		let (tx,rx) = sync_channel(1);
+		start_backend(rx);
 
-	tauri::Builder::default()
-		// Tell the child process to shutdown when app exits
-		.on_window_event(move |event| match event.event() {
-		WindowEvent::Destroyed => {
-			tx.send(-1).expect("[Error] sending msg.");
-			println!("[Event] App closed, shutting down API...");
-		}
-		_ => {}
-		})
+		tauri::Builder::default()
+			// Tell the child process to shutdown when app exits
+			.on_window_event(move |event| match event.event() {
+			WindowEvent::Destroyed => {
+				tx.send(-1).expect("[Error] sending msg.");
+				println!("[Event] App closed, shutting down API...");
+			}
+			_ => {}
+			})
+			.run(tauri::generate_context!())
+			.expect("[Error] while running tauri application");
+	} else {
+		tauri::Builder::default()
 		.run(tauri::generate_context!())
-		.expect("[Error] while running tauri application");
+		.expect("error while running tauri application");
+	}
+
 }
