@@ -41,3 +41,12 @@ def reshape_matrix(matriz, nuevo_ancho, nuevo_alto):
             matriz_redimensionada[i, j] = matriz[y_original, x_original]
     
     return matriz_redimensionada
+
+def get_new_size(image, ancho, alto):
+  o_alto, o_ancho = image.shape
+  n_alto, n_ancho = alto, ancho
+  
+  resize_ratio = min(n_alto/o_alto, n_ancho/o_ancho)
+  new_width = int(o_ancho * resize_ratio)
+  new_height = int(o_alto * resize_ratio)
+  return new_width, new_height
