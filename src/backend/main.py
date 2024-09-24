@@ -25,7 +25,7 @@ app.add_middleware(
   # allow_credentials=True,
   allow_methods=["*"],
   allow_headers=["*"],
-  expose_headers=["X-shape"],
+  expose_headers=["X-shape", "X-resize"]
 )
 
 @app.get("/")

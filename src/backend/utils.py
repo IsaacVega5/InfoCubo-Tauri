@@ -49,4 +49,4 @@ def get_new_size(image, ancho, alto):
   resize_ratio = min(n_alto/o_alto, n_ancho/o_ancho)
   new_width = int(o_ancho * resize_ratio)
   new_height = int(o_alto * resize_ratio)
-  return new_width, new_height
+  return new_width, new_height, resize_ratio
