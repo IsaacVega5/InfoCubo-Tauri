@@ -20,6 +20,7 @@ export default function Points({histograms}) {
 
       return (
         <div 
+          key={`K-dot-${histogram.id}`}
           style={{
             position: 'absolute',
             display: 'flex',
