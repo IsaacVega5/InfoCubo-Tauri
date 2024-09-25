@@ -168,3 +168,11 @@ def hdr_info_file(path):
   metadata['description'] = metadata['description'].replace('{', '').replace('}', '')
   file.close()
   return metadata
+
+def hiper_image_validation_path(path):
+  path = path.replace('"', "")
+  image = path.replace('.hdr', "")
+  if not os.path.exists(image) or not os.path.exists(path):
+    return False
+  else:
+    return True

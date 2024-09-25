@@ -11,8 +11,11 @@ router = APIRouter(
 
 @router.get("/")
 def read_envi(path, band, rotation=0, reshape=[None, None]):
+  if hiper.hiper_image_validation_path(path) == False: return {"error": "Image not found", "code": 404}
+  
   reshape = json.loads(reshape)
-  img, shape, resize_ratio= hiper.read_envi(path, band, rotation, reshape)
+  res = hiper.read_envi(path, band, rotation, reshape)
+  img, shape, resize_ratio = res
   return StreamingResponse(img, media_type="image/png", headers={"X-shape": ",".join([str(i) for i in shape]), "X-resize": str(resize_ratio)})
   
 @router.get("/info/")
