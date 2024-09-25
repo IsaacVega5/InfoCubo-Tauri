@@ -95,11 +95,11 @@ export default function ImageViewer({loader, setLoader}) {
     const rect = canvas.getBoundingClientRect();
     const resize_factor = rect.height / hiperImgValues.shape[0]
     
-    const x = (e.clientX - rect.left) / resize_factor;
-    const y = (e.clientY - rect.top) / resize_factor;
-
+    const x = ((e.clientX - rect.left) / resize_factor);
+    const y = ((e.clientY - rect.top) / resize_factor);
+    
     if (toolsValues.pixelCheck && toolsValues.rotationValue == 0){
-      let {value, coords, error} = await getPixelInfo({path: hiperImgValues.path, x: x, y: y})
+      let {value, coords, error} = await getPixelInfo({path: hiperImgValues.path, x: x / hiperImgValues.resize, y: y / hiperImgValues.resize})
       
       if (!error){
         setHistograms([...histograms, {
@@ -114,7 +114,7 @@ export default function ImageViewer({loader, setLoader}) {
         }])
       }
       else{
-        console.error(`Error: ${error} at x: ${x}, y: ${y}`);
+        console.error(`Error: ${error} at x: ${x / hiperImgValues.resize}, y: ${y / hiperImgValues.resize}`);
       }
     }else if(toolsValues.pixelCheck && toolsValues.rotationValue !=0 ){
       toast.error(`Rotación debe ser igual a 0 para realizar esta operación`)

@@ -21,6 +21,7 @@ def read_envi(path, band, rotation=0, reshape=[None, None]):
   resize_ratio = 1
   if path in image_dict and image_dict[path]["band"] == int(band) and image_dict[path]["reshape"] == reshape:
     banda = image_dict[path]["matrix"]
+    resize_ratio = image_dict[path]["resize_ratio"]
   else:
     banda = image.read_band(int(band))
     
@@ -32,7 +33,8 @@ def read_envi(path, band, rotation=0, reshape=[None, None]):
     image_dict[path] = {
       "band": int(band),
       "reshape": reshape,
-      "matrix" : banda
+      "matrix" : banda,
+      "resize_ratio": resize_ratio
     }
   
   if rotation != 0:
