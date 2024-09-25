@@ -66,11 +66,12 @@ export default function InputRotation({ setLoader }) {
   }
 
   let rotateImage = async () => {
+    if (hiperImgValues.path == "") return
     setLoader(true)
     setToolsValues({...toolsValues, rotationValue: rotation})
-    if (hiperImgValues.path == "") return
     const {width, height} = getElementShape("img_cont")
-    const {url, shape, resize} = await getImgUrl({path: hiperImgValues.path, channel: hiperImgValues.channel, rotation: rotation, reshape:[width,height]})
+    const {url, shape, resize, error} = await getImgUrl({path: hiperImgValues.path, channel: hiperImgValues.channel, rotation: rotation, reshape:[width,height]})
+    if (error) return setLoader(false)
     setHiperImgValues({...hiperImgValues, url: url, shape: shape, resize: resize})
     setLoader(false)
   }

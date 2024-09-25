@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
 from services import hiper
 import json
 
@@ -11,8 +11,12 @@ router = APIRouter(
 
 @router.get("/")
 def read_envi(path, band, rotation=0, reshape=[None, None]):
+  if not hiper.hiper_image_validation_path(path):
+    return Response(status_code=404, content="Image not found")
+  
   reshape = json.loads(reshape)
-  img, shape, resize_ratio= hiper.read_envi(path, band, rotation, reshape)
+  res = hiper.read_envi(path, band, rotation, reshape)
+  img, shape, resize_ratio = res
   return StreamingResponse(img, media_type="image/png", headers={"X-shape": ",".join([str(i) for i in shape]), "X-resize": str(resize_ratio)})
   
 @router.get("/info/")

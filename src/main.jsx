@@ -11,7 +11,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <ToolsProvider>
       <OptionDialogProvider>
         <App />
-        <Toaster position="bottom-center"/>
+        <Toaster position="bottom-center" toastOptions={{
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          }
+        }}/>
       </OptionDialogProvider>
     </ToolsProvider>
   </HiperImgProvider>
