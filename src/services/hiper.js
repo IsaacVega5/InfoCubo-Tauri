@@ -1,4 +1,4 @@
-
+import toast from 'react-hot-toast';
 const BACKEND_URL = "http://localhost:8008/envi"
 
 export let getPixelInfo = async ({path, x, y}) =>{
@@ -15,7 +15,18 @@ export let getPixelInfo = async ({path, x, y}) =>{
 export let getImgUrl = async ({path,channel=0,rotation=0, reshape=[null, null]}) =>{
   reshape = JSON.stringify(reshape)
   const response = await fetch(`${BACKEND_URL}/?path="${path}"&band=${channel}&rotation=${rotation}&reshape=${reshape}`)
-  
+
+  if (response.status == 404) {
+    toast.error("Imagen no encontrada\nrevise la imagen y su archivo .hdr estén ubicados en la misma carpeta")
+
+    return{
+      url: null,
+      shape: null,
+      resize: null,
+      error: "Image not found"
+    }
+  }
+
   return {
     url: response.url,
     shape: response.headers.get('X-shape').split(','),

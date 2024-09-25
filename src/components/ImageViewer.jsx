@@ -41,8 +41,8 @@ export default function ImageViewer({loader, setLoader}) {
     try{
       
       const {width, height} = getElementShape("img_cont")
-      const {url, shape, resize} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
-      
+      const {url, shape, resize, error} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
+      if (error) return setLoader(false)
       setHiperImgValues({...hiperImgValues, url: url, shape: shape, resize: resize})
       
       let slider = document.getElementById("band_slider")
@@ -141,7 +141,8 @@ export default function ImageViewer({loader, setLoader}) {
   const onResizeCanvas = async (width, height) => {
     if (hiperImgValues.path == "") return
     setLoader(true)
-    const {url, shape, resize} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
+    const {url, shape, resize, error} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
+    if (error) return setLoader(false)
     setHiperImgValues({...hiperImgValues, url: url, shape: shape, resize: resize})
     setLoader(false)
   }
