@@ -17,7 +17,7 @@ export let getImgUrl = async ({path,channel=0,rotation=0, reshape=[null, null]})
   const response = await fetch(`${BACKEND_URL}/?path="${path}"&band=${channel}&rotation=${rotation}&reshape=${reshape}`)
 
   if (response.status == 404) {
-    toast.error("Imagen no encontrada\nrevise la imagen y su archivo .hdr estén ubicados en la misma carpeta")
+    toast.error("Imagen no encontrada\nRevise que la imagen y su archivo .hdr estén ubicados en la misma carpeta")
 
     return{
       url: null,

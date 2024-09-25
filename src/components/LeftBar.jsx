@@ -5,6 +5,8 @@ import { RiImageAddFill } from "react-icons/ri";
 import { open } from "@tauri-apps/api/dialog";
 import { HiperImgContext } from '../context/hiperImg.jsx';
 import { ToolsContext } from '../context/tools.jsx';
+import { checkHiperPath } from '../services/utils.js';
+import toast from 'react-hot-toast';
 
 export default function LeftBar() {
   const {hiperImgValues, setHiperImgValues} = useContext(HiperImgContext)
@@ -21,7 +23,8 @@ export default function LeftBar() {
       ],
     })
     if (!selected) return
-
+    if (!await checkHiperPath(selected)) return toast.error("Imagen no encontrada\nRevise que la imagen y su archivo .hdr estén ubicados en la misma carpeta")
+    
     setHiperImgValues(prev => ({...prev, path: selected}))
     setToolsValues({...toolsValues, rotationValue:0})
   }
