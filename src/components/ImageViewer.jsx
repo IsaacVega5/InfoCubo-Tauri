@@ -117,14 +117,7 @@ export default function ImageViewer({loader, setLoader}) {
         console.error(`Error: ${error} at x: ${x}, y: ${y}`);
       }
     }else if(toolsValues.pixelCheck && toolsValues.rotationValue !=0 ){
-      toast.error(`Rotación debe ser igual a 0 para realizar esta operación`,{
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        }
-      })
-
+      toast.error(`Rotación debe ser igual a 0 para realizar esta operación`)
     }
 
     if (toolsValues.cutCheck){
