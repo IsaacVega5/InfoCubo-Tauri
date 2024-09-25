@@ -1,11 +1,9 @@
 import './HistogramGroup.css'
 
 import ChannelHistogram from './ChannelHistogram.jsx'
-import { useContext, useEffect, useState } from 'react'
-import { HiperImgContext } from '../../context/hiperImg.jsx'
+import { useEffect, useState } from 'react'
 
 function HistogramGroup({histograms, setHistograms}) {
-	const {hiperImgValues, setHiperImgValues} = useContext(HiperImgContext)
   const [dragging, setDragging] = useState("")
   const[mouseDistance, setMouseDistance] = useState(({x: 0, y: 0}))
   
