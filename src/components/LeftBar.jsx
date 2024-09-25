@@ -47,7 +47,7 @@ export default function LeftBar() {
 
 
       <span className="leyenda">
-        InfoCubo v4.0
+        InfoCubo v4.1
       </span>
     </div>
   )
