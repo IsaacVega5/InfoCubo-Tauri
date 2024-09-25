@@ -64,10 +64,10 @@ function HistogramGroup({histograms, setHistograms}) {
   
   const group = histograms.map((histogram) => {
     
-    let x = histogram.coords[0]
-    let y = histogram.coords[1]
-
-    let title = `Histograma | x: ${Math.floor(x)} y: ${Math.floor(y)}`
+    let x = histogram.imgCoords[0]
+    let y = histogram.imgCoords[1]
+    
+    let title = `Histograma | x: ${x} y: ${y}`
 
     return (
       <ChannelHistogram 
