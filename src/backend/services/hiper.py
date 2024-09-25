@@ -10,18 +10,31 @@ import pandas as pd
 import utils as ut
 import cv2
 
+image_dict ={}
+
 def read_envi(path, band, rotation=0, reshape=[None, None]):
   path = path.replace('"', "")
   image = envi.open(path, path.replace('.hdr', ""))
   if int(band) > image.shape[2]:
     return "error"
   
-  banda = image.read_band(int(band))
   resize_ratio = 1
-  if reshape != [None, None]:
-    new_width, new_height, resize_ratio = ut.get_new_size(banda, int(reshape[0]), int(reshape[1]))
-    banda = cv2.resize(banda, (new_width, new_height), interpolation = cv2.INTER_NEAREST)   
-  banda = cv2.normalize(banda, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+  if path in image_dict and image_dict[path]["band"] == int(band) and image_dict[path]["reshape"] == reshape:
+    banda = image_dict[path]["matrix"]
+  else:
+    banda = image.read_band(int(band))
+    
+    if reshape != [None, None]:
+      new_width, new_height, resize_ratio = ut.get_new_size(banda, int(reshape[0]), int(reshape[1]))
+      banda = cv2.resize(banda, (new_width, new_height), interpolation = cv2.INTER_NEAREST)
+    banda = cv2.normalize(banda, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+       
+    image_dict[path] = {
+      "band": int(band),
+      "reshape": reshape,
+      "matrix" : banda
+    }
+  
   if rotation != 0:
     banda = tf.rotate_matrix(banda, float(rotation) *-1)
   _, img_encoded = cv2.imencode('.png', banda)
