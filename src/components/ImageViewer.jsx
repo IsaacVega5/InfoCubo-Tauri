@@ -139,6 +139,7 @@ export default function ImageViewer({loader, setLoader}) {
   }
 
   const onResizeCanvas = async (width, height) => {
+    if (hiperImgValues.path == "") return
     setLoader(true)
     const {url, shape, resize} = await getImgUrl({path: hiperImgValues.path, rotation: toolsValues.rotationValue, reshape:[width,height]})
     setHiperImgValues({...hiperImgValues, url: url, shape: shape, resize: resize})
