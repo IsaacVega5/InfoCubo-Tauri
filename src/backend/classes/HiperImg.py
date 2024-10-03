@@ -32,7 +32,9 @@ class HiperImg:
       line = line.strip()
       if line == 'ENVI': continue
       if '=' in line:
-        key, value = line.split('=')
+        list_line = line.split('=')
+        key = list_line[0].strip()
+        value = '='.join(list_line[1:])
         metadata[key.strip()] = value.strip()
         past_key = key.strip()
       else:
