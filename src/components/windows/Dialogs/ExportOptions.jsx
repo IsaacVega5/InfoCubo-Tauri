@@ -44,7 +44,8 @@ export default function ExportOptions({setLoader}) {
         y: point.y / hiperImgValues.resize
       }
     })
-    const name_cutPoints = (resizedCutPoints == null) ? 'NONE' : Math.floor(resizedCutPoints[0].x) + '_' + Math.floor(resizedCutPoints[0].y)
+    
+    const name_cutPoints = (resizedCutPoints == null || resizedCutPoints[0] == null) ? 'NONE' : Math.floor(resizedCutPoints[0].x) + '_' + Math.floor(resizedCutPoints[0].y)
     const pathParts = hiperImgValues.path.split('\\');
     const fileName = pathParts.pop().split('.')[0] + '_rotated_'+toolsValues.rotationValue + '_cut_' + name_cutPoints;
     const path = pathParts.join('\\');
