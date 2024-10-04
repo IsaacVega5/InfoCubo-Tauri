@@ -1,6 +1,6 @@
 [package]
 name = "InfoCubo"
-version = "4.1.0"
+version = "4.1.1"
 description = "InfoCubo"
 authors = ["Isaac Vega"]
 edition = "2021"
