@@ -1,0 +1,25 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "../backend/dist/infocubo-backend",
+          "sidecar": true
+        }
+      ]
+    },
+    "shell:allow-open",
+    "core:window:allow-close",
+    "core:window:allow-destroy",
+    "dialog:default"
+  ]
+}

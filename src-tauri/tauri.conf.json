@@ -1,75 +1,40 @@
 {
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "infocubo",
+  "version": "0.1.0",
+  "identifier": "com.infocubo.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "pnpm build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "frontendDist": "../dist"
   },
-  "package": {
-    "productName": "info-cubo",
-    "version": "4.1.1"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "http": {
-        "all": true,
-        "request": true,
-        "scope": ["http://**", "https://**"]
-      },
-      "shell": {
-        "all": false,
-        "open": true,
-        "execute": true,
-        "scope": [
-          {
-            "name" : "open-explorer",
-            "cmd": "explorer",
-            "args": [{ "validator": ""}]
-          },
-          {
-            "name": "bin/api/fastapi",
-            "sidecar": true
-          }
-        ]
-      },
-      "fs":{
-        "exists": true,
-        "readDir": true,
-        "scope": ["**"],
-        "createDir": true
-      },
-      "dialog": {
-        "all": false,
-        "ask": false,
-        "confirm": false,
-        "message": false,
-        "open": true,
-        "save": true
-      }
-    },
+  "app": {
     "windows": [
       {
-        "title": "InfoCubo",
+        "title": "Info Cubo",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "minHeight": 600,
+        "minWidth": 600
       }
     ],
     "security": {
       "csp": null
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.info.cubo",
-      "externalBin": ["bin/api/fastapi"],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
     }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "externalBin": [
+      "../backend/dist/infocubo-backend"
+    ]
   }
 }
