@@ -11,9 +11,13 @@ node_modules
 dist
 dist-ssr
 *.local
+env
+venv
+.venv
 
 # Editor directories and files
 .vscode/*
+.vscode
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -26,10 +30,9 @@ dist-ssr
 bin
 .src-tauri/bin/*
 .src-tauri/target/*
-env
 dist
 build
 node_modules
 __pycache__
-fastapi-x86_64-pc-windows-msvc.spec
+infocubo-backend-x86_64-pc-windows-msvc.spec
 *.exe
