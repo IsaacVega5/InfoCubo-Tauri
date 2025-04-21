@@ -36,3 +36,4 @@ node_modules
 __pycache__
 infocubo-backend-x86_64-pc-windows-msvc.spec
 *.exe
+*.spec
