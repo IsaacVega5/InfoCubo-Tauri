@@ -1,4 +1,4 @@
-import { lazy, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import useLongPress from "../hooks/useLongPress"
 import { pixelData } from "../context/ToolsBarContext"
 import { useImages } from "../hooks/useImages"
@@ -13,6 +13,13 @@ import { event } from "@tauri-apps/api"
 import Chart from "./Chart"
 import SelectedArea from "./SelectedArea"
 
+interface selectedArea {
+  x1: number | null
+  y1: number | null
+  x2: number | null
+  y2: number | null
+}
+
 export default function DataGetHandler() {
   const { currentImage } = useImages()
   const { isPixelGetActivated, pixelDataList } = useToolBar()
@@ -22,7 +29,7 @@ export default function DataGetHandler() {
   const [imgOffSet, setImgOffSet] = useState({ left: 0, top: 0, ratio: 1 })
   const selfRef = useRef<HTMLDivElement>(null)
   const [isMouseHold, setIsMouseHold] = useState(false)
-  const [mouseSelectedArea, setMouseSelectedArea] = useState({ x1: 0, y1: 0, x2: 0, y2: 0 })
+  const [mouseSelectedArea, setMouseSelectedArea] = useState<selectedArea>({ x1: null, y1: null, x2: null, y2: null })
 
 
   useEffect(() => {
@@ -38,6 +45,7 @@ export default function DataGetHandler() {
   }, [])
 
   const handleMouseMove = (e: MouseEvent) => {
+    if(!isMouseHold) return
     const bcr = selfRef.current!.getBoundingClientRect()
     const x = e.clientX - bcr.left
     const y = e.clientY - bcr.top
@@ -45,12 +53,13 @@ export default function DataGetHandler() {
       x < 0 || x > bcr.width ||
       y < 0 || y > bcr.height
     ) return
-
-    setMouseSelectedArea({
-      x1: mouseSelectedArea.x1,
-      y2: mouseSelectedArea.x2,
-      x2: x, y2: y
-    })
+    console.log(x, y);
+    
+    if (!mouseSelectedArea.x1) {
+      setMouseSelectedArea({ x1: x, y1: y, x2: x, y2: y })
+    }else{
+      setMouseSelectedArea(prev => ({ ...prev, x2: x, y2: y }))
+    }
 
   }
 
@@ -80,12 +89,14 @@ export default function DataGetHandler() {
     addProcess(wsEvents.READ_IMAGE_PIXEL)
   }
   const longpress = () => {
-    setMouseSelectedArea({ x1: 0, y1: 0, x2: 0, y2: 0 })
+    console.log('longpress');
+    
     setIsMouseHold(true)
   }
   const { handlers } = useLongPress({
     click: press,
-    longpress
+    longpress, 
+    wait: 100
   })
 
   const setImageOffsetForPixels = () => {
@@ -144,7 +155,7 @@ export default function DataGetHandler() {
           )
         }
         {
-          isMouseHold && <SelectedArea position={mouseSelectedArea} />
+          (isMouseHold) && <SelectedArea position={mouseSelectedArea} />
         }
       </div>
     </div>
