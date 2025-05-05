@@ -42,9 +42,9 @@ export default function DataGetHandler() {
   useEffect(() => {
     document.addEventListener('mousemove', handleMouseMove)
     return () => document.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+  }, [isMouseHold, mouseSelectedArea])
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = (e: MouseEvent) => {    
     if(!isMouseHold) return
     const bcr = selfRef.current!.getBoundingClientRect()
     const x = e.clientX - bcr.left
@@ -88,14 +88,26 @@ export default function DataGetHandler() {
     });
     addProcess(wsEvents.READ_IMAGE_PIXEL)
   }
-  const longpress = () => {
+  const longPress = (event: React.MouseEvent<HTMLElement>) => {
     console.log('longpress');
-    
+    const bcr = selfRef.current!.getBoundingClientRect()
+    const x = event.clientX - bcr.left
+    const y = event.clientY - bcr.top
+    if (
+      x < 0 || x > bcr.width ||
+      y < 0 || y > bcr.height
+    ) return
+    setMouseSelectedArea({ x1: x, y1: y, x2: x, y2: y })
     setIsMouseHold(true)
+  }
+  const onPressStop = () => {
+    setIsMouseHold(false)
+    setMouseSelectedArea({ x1: null, y1: null, x2: null, y2: null })
   }
   const { handlers } = useLongPress({
     click: press,
-    longpress, 
+    longPress : longPress, 
+    pressStop: onPressStop,
     wait: 100
   })
 
