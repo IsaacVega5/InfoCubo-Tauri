@@ -23,13 +23,17 @@ async def read_image_area(path, rotation = 0, area = {'x1': 0, 'y1': 0, 'x2': 0,
   min_x = min(area['x1'], area['x2'])
   max_x = max(area['x1'], area['x2'])
   
-  image = image[min_y:max_y, min_x:max_x].tolist()
-  print(len(image[0][0]))
-  mean, min, max = [], [], []
-  for i in range(len(image[0][0])):
-    mean.append(np.mean(image[0][0][i]))
-    min.append(np.min(image[0][0][i]))
-    max.append(np.max(image[0][0][i]))
+  min_y = min_y if min_y >= 0 else 0
+  max_y = max_y if max_y < image.shape[0] else image.shape[0]
+  min_x = min_x if min_x >= 0 else 0
+  max_x = max_x if max_x < image.shape[1] else image.shape[1]
+  
+  image = image[min_y:max_y, min_x:max_x]
+  mean_list, min_list, max_list = [], [], []
+  for i in range(image.shape[2]):
+    mean_list.append(float(np.mean(image[:,:,i])))
+    min_list.append(float(np.min(image[:,:,i])))
+    max_list.append(float(np.max(image[:,:,i])))
     
   return {
     'id' : str(uuid.uuid4()),
@@ -40,6 +44,11 @@ async def read_image_area(path, rotation = 0, area = {'x1': 0, 'y1': 0, 'x2': 0,
       'y1': min_y,
       'x2': max_x,
       'y2': max_y
+    },
+    'data': {
+      'mean': mean_list,
+      'min': min_list,
+      'max': max_list,
     }
   }
   

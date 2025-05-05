@@ -53,7 +53,6 @@ export default function DataGetHandler() {
       x < 0 || x > bcr.width ||
       y < 0 || y > bcr.height
     ) return
-    console.log(x, y);
     
     if (!mouseSelectedArea.x1) {
       setMouseSelectedArea({ x1: x, y1: y, x2: x, y2: y })
@@ -102,6 +101,23 @@ export default function DataGetHandler() {
   }
   const onPressStop = () => {
     setIsMouseHold(false)
+    console.log("PRESS STOP");
+    if (!mouseSelectedArea.x1 || !mouseSelectedArea.y1 || !mouseSelectedArea.x2 || !mouseSelectedArea.y2) return
+
+    const area = {
+      'x1': Math.floor((mouseSelectedArea.x1 - imgOffSet.left) / imgOffSet.ratio),
+      'y1': Math.floor((mouseSelectedArea.y1 - imgOffSet.top) / imgOffSet.ratio),
+      'x2': Math.floor((mouseSelectedArea.x2 - imgOffSet.left) / imgOffSet.ratio),
+      'y2': Math.floor((mouseSelectedArea.y2 - imgOffSet.top) / imgOffSet.ratio)
+    }
+
+    sendMessage(wsEvents.READ_IMAGE_AREA, {
+      'path': currentImage!.path,
+      'rotation': currentImage!.rotation,
+      'area': area
+    });
+    
+    addProcess(wsEvents.READ_IMAGE_AREA)
     setMouseSelectedArea({ x1: null, y1: null, x2: null, y2: null })
   }
   const { handlers } = useLongPress({
@@ -161,7 +177,7 @@ export default function DataGetHandler() {
                 key={`chart-${pixelData.id}`}
                 id={pixelData.id}
                 parentRef={selfRef}
-                title={`Data forfunction docstring: ${pixelData.coord.x}, ${pixelData.coord.y} with ${pixelData?.rotation}°`}
+                title={`Data for function: ${pixelData.coord.x}, ${pixelData.coord.y} with ${pixelData?.rotation}°`}
                 data={pixelData.data} />
             ))
           )

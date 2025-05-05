@@ -23,14 +23,12 @@ function startPressTimer(event: React.MouseEvent<HTMLElement>) {
   timerRef.current = setTimeout(() => {
     isLongPress.current = true;
     longPress(event);
-    setAction('longpress');
+    setAction('longPress');
   }, wait);
 }
 
 function handleOnClick(event: React.MouseEvent<HTMLElement>) {
-  if (isLongPress.current) {
-    return;
-  }
+  if (isLongPress.current) return
   setAction('click');
   click(event);
 }
@@ -41,7 +39,9 @@ function handleOnMouseDown(event: React.MouseEvent<HTMLElement>) {
 
 function handleOnMouseUp() {
   clearTimeout(timerRef.current);
-  pressStop();
+  if (isLongPress.current){
+    pressStop();
+  }
 }
 
 function handleOnTouchStart(event: React.TouchEvent<HTMLElement>) {
@@ -51,9 +51,14 @@ function handleOnTouchStart(event: React.TouchEvent<HTMLElement>) {
 }
 
 function handleOnTouchEnd() {
-  if (action === 'longpress') return;
+  if (action === 'longPress') return;
+
   clearTimeout(timerRef.current);
-  pressStop();
+  if (isLongPress.current){
+    isLongPress.current = false;
+    pressStop();
+  }
+  // pressStop();
 }
 
 return {

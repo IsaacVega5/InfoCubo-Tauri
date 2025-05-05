@@ -68,7 +68,10 @@ function App() {
     subscribe(wsEvents.READ_IMAGE_PIXEL, (data:any) => {
       addPixelData(data.id, data.path, data.data, {x: data.x, y: data.y}, data.rotation)
       removeProcess(wsEvents.READ_IMAGE_PIXEL)
-      
+    })
+
+    subscribe(wsEvents.READ_IMAGE_AREA, (data:any) => {
+      console.log(data);
     })
 
     return () => {
