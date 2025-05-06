@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import useLongPress from "../hooks/useLongPress"
-import { pixelData } from "../context/ToolsBarContext"
+import { dataListElement, multiDataData } from "../context/ToolsBarContext"
 import { useImages } from "../hooks/useImages"
 import PixelLocation from "./PixelLocation"
 import useToolBar from "../hooks/useToolBar"
@@ -12,6 +12,8 @@ import { listen } from "@tauri-apps/api/event"
 import { event } from "@tauri-apps/api"
 import Chart from "./Chart"
 import SelectedArea from "./SelectedArea"
+import ChartView from "./ChartView"
+import AreaLocation from "./AreaLocation"
 
 interface selectedArea {
   x1: number | null
@@ -22,10 +24,10 @@ interface selectedArea {
 
 export default function DataGetHandler() {
   const { currentImage } = useImages()
-  const { isPixelGetActivated, pixelDataList } = useToolBar()
+  const { isPixelGetActivated, dataList } = useToolBar()
   const { sendMessage } = useWebSocket()
   const { addProcess } = useLoader()
-  const [currentPixelDataList, setCurrentPixelDataLista] = useState<pixelData[]>([])
+  const [currentDataList, setCurrentDataList] = useState<dataListElement[]>([])
   const [imgOffSet, setImgOffSet] = useState({ left: 0, top: 0, ratio: 1 })
   const selfRef = useRef<HTMLDivElement>(null)
   const [isMouseHold, setIsMouseHold] = useState(false)
@@ -34,10 +36,10 @@ export default function DataGetHandler() {
 
   useEffect(() => {
     if (!currentImage) return
-    const list = pixelDataList.filter(pixelData => (pixelData.path === currentImage.path))
-    setCurrentPixelDataLista(list)
+    const list = dataList.filter(data => (data.path === currentImage.path))
+    setCurrentDataList(list)
 
-  }, [currentImage, pixelDataList])
+  }, [currentImage, dataList])
 
   useEffect(() => {
     document.addEventListener('mousemove', handleMouseMove)
@@ -156,29 +158,56 @@ export default function DataGetHandler() {
       <div className="h-full w-full absolute" {...handlers}></div>
       <div className="h-full w-full">
         {
-          currentPixelDataList.length > 0 && (
-            currentPixelDataList.map((pixelData: pixelData, index: number) => {
-              if (currentImage?.rotation === pixelData.rotation && currentImage.path === pixelData.path) return (
-                <PixelLocation
-                  key={`pxl-${pixelData.id}`}
-                  id={pixelData.id}
-                  x={pixelData.coord.x * imgOffSet.ratio + imgOffSet.left}
-                  y={pixelData.coord.y * imgOffSet.ratio + imgOffSet.top}
-                  selected={index === currentPixelDataList.length - 1}
-                  text={`${pixelData.coord.x}, ${pixelData.coord.y}`} />
+          currentDataList.length > 0 && (
+            currentDataList.map((data: dataListElement, index: number) => {
+              console.log(data);
+              
+              if (currentImage?.rotation === data.rotation && currentImage.path === data.path) return (
+                data.type === 'pixel' 
+                ?  <PixelLocation
+                    key={`pxl-${data.id}`}
+                    id={data.id}
+                    x={(data.coords as { x: number, y: number }).x * imgOffSet.ratio + imgOffSet.left}
+                    y={(data.coords as { x: number, y: number }).y * imgOffSet.ratio + imgOffSet.top}
+                    selected={index === currentDataList.length - 1}
+                    text={`${(data.coords as { x: number, y: number }).x}, ${(data.coords as { x: number, y: number }).y}`} 
+                    />
+                : <AreaLocation
+                  key= {`area-${data.id}`}
+                  id = {data.id}
+                  text="Area"
+                  selected={index === currentDataList.length - 1}
+                  x1 = {(data.coords as { x1: number, y1: number, x2: number, y2: number }).x1 * imgOffSet.ratio + imgOffSet.left}
+                  y1 = {(data.coords as { x1: number, y1: number, x2: number, y2: number }).y1 * imgOffSet.ratio + imgOffSet.top}
+                  x2 = {(data.coords as { x1: number, y1: number, x2: number, y2: number }).x2 * imgOffSet.ratio + imgOffSet.left}
+                  y2 = {(data.coords as { x1: number, y1: number, x2: number, y2: number }).y2 * imgOffSet.ratio + imgOffSet.top}
+                  />
               )
             })
           )
         }
         {
-          currentPixelDataList.length > 0 && (
-            currentPixelDataList.map((pixelData: pixelData) => (
-              <Chart
-                key={`chart-${pixelData.id}`}
-                id={pixelData.id}
+          currentDataList.length > 0 && (
+            currentDataList.map((data: dataListElement) => (
+              <ChartView
+                key={`chart-${data.id}`}
+                id={data.id}
                 parentRef={selfRef}
-                title={`Data for function: ${pixelData.coord.x}, ${pixelData.coord.y} with ${pixelData?.rotation}°`}
-                data={pixelData.data} />
+                title="Data"
+                dataList={data.type === 'area' ? [{
+                  title: "min",
+                  data: (data.data as multiDataData).min,
+                  style: { color: '#339AF0', lineStyle: 1 }
+                }, {
+                  title: "max",
+                  data: (data.data as multiDataData).max,
+                  style: { color: '#FA5252', lineStyle: 1 }
+                }, {
+                  title: "mean",
+                  data: (data.data as multiDataData).mean,
+                }] : 
+                [{ data: data.data as number[] }]}
+              />
             ))
           )
         }

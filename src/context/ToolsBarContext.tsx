@@ -1,47 +1,60 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
-export const ToolsBarContext = createContext<{
-  pixelDataList: pixelData[],
-  isPixelGetActivated: (path: string) => boolean
-  activatePixelGet: (path: string) => void
-  deactivatePixelGet: (path: string) => void
-  addPixelData: (id:string, path: string, data: number[], pos: {x: number, y: number}, rotation: number) => void
-  getAllPixelDataFromPath: (path: string) => pixelData[] | undefined
-  removePixelDataFromPath: (path: string) => void
-  getPixelDataFromId: (id: string) => pixelData | undefined
-  removePixelDataFromId: (id: string) => void
-  updatePixelDataFromId: (id: string, data: number[], pos: {x: number | null, y: number | null}) => void,
-  moveUpPixelDataFromId: (id: string) => void,
+// export interface pixelData {
+//   id: string,
+//   path: string,
+//   data: number[],
+//   coords: {x: number, y: number},
+//   pos: {x: number | null, y: number | null},
+//   rotation: number
+// }
 
-  areaDataList: areaData[],
-  addAreaData: (id: string, path: string, coords: { x1: number; y1: number; x2: number; y2: number; }, data: { mean: number[]; min: number[]; max: number[]; }) => void
-  getAreaDataFromId: (id: string) => areaData | undefined
-  removeAreaDataFromId: (id: string) => void
-} | null>(null);
+export interface multiDataData {
+  mean: number[],
+  min: number[],
+  max: number[],
+}
 
-export interface pixelData {
+// export interface areaData {
+//   id: string,
+//   path: string,
+//   data: multiDataData,
+//   pos : {x: number | null, y: number | null},
+//   coords : {x1: number, y1: number, x2: number, y2: number},
+//   rotation: number
+// }
+
+
+
+export interface dataListElement {
+  type: 'pixel' | 'area',
   id: string,
   path: string,
-  data: number[],
-  coord: {x: number, y: number},
+  data: number[] | multiDataData,
+  coords: {x: number, y: number} | {x1: number, y1: number, x2: number, y2: number},
   pos: {x: number | null, y: number | null},
   rotation: number
 }
-export interface areaData {
-  id: string,
-  path: string,
-  coords : {x1: number, y1: number, x2: number, y2: number},
-  data: {
-    mean: number[],
-    min: number[],
-    max: number[],
-  },
-}
+
+
+export const ToolsBarContext = createContext<{
+  dataList: dataListElement[],
+  isPixelGetActivated: (path: string) => boolean
+  activatePixelGet: (path: string) => void
+  deactivatePixelGet: (path: string) => void
+  addData: (id:string, path: string, data: number[] | multiDataData, coords: {x: number, y: number} | {x1: number, y1: number, x2: number, y2: number}, rotation: number, type: 'pixel' | 'area') => void
+  getAllDataFromPath: (path: string) => dataListElement[] | undefined
+  removeDataFromPath: (path: string) => void
+  getDataFromId: (id: string) => dataListElement | undefined
+  removeDataFromId: (id: string) => void
+  updateDataFromId: (id: string, newData : {data?: number[], pos?: {x: number | null, y: number | null}}) => void,
+  moveUpDataFromId: (id: string) => void,
+} | null>(null);
+
 
 export function ToolsBarProvider({ children } : any) {
   const [pixelActivated, setPixelActivated] = useState<string[]>([]);
-  const [pixelDataList, setPixelDataList] = useState<pixelData[]>([]);
-  const [areaDataList, setAreaDataList] = useState<areaData[]>([]);
+  const [dataList, setDataList] = useState<dataListElement[]>([]);
 
   const isPixelGetActivated = (path: string) => pixelActivated.includes(path);
   
@@ -49,72 +62,64 @@ export function ToolsBarProvider({ children } : any) {
 
   const deactivatePixelGet = (path: string) => setPixelActivated(pixelActivated.filter((p) => p !== path));
 
-  const addPixelData = (id: string, path: string, data: number[], coord: {x: number, y: number}, rotation: number) => {
-    const dbData = getPixelDataFromId(id)
+  const addData = (id: string, path: string, data: number[] | multiDataData, coords: {x: number, y: number} | {x1: number, y1: number, x2: number, y2: number}, rotation: number, type: 'pixel' | 'area') => {
+    const dbData = getDataFromId(id)
     if (dbData) return
-    setPixelDataList(prev => [...prev,
-      {
-        id: id, 
-        path : path, 
-        data : data, 
-        coord: coord,
-        pos: {x: null, y: null}, 
-        rotation : rotation
-      }]);
-  }
-  const addAreaData = (id: string, path: string, coords: {x1: number, y1: number, x2: number, y2: number}, data: {mean: number[], min: number[], max: number[]}) => {
-    const dbData = getAreaDataFromId(id)
-    if (dbData) return
-    setAreaDataList(prev => [...prev,
-      {
-        id: id, 
-        path : path, 
-        coords : coords,
-        data : data
-      }]);
-  }
-  const getAreaDataFromId = (id: string) => areaDataList.find((p) => p.id === id)
-  const removeAreaDataFromId = (id: string) => setAreaDataList(areaDataList.filter((p) => p.id !== id))
-
-  const getAllPixelDataFromPath = (path: string) => {
-    return pixelDataList.filter((p) => p.path === path);
+    setDataList(prev => [...prev, {
+      type: type,
+      id: id, 
+      path : path, 
+      data : type === 'pixel' ? data as number[] : data, 
+      coords : coords,
+      pos: {x: null, y: null}, 
+      rotation : rotation
+    }])
   }
 
-  const removePixelDataFromPath = (path: string) => {
-    const new_data = pixelDataList.filter((p) => p.path !== path);
-    setPixelDataList(new_data);
+  useEffect(() => {
+    console.log(dataList)
+  }, [dataList])
+
+  const getAllDataFromPath = (path: string) => {
+    return dataList.filter((data) => data.path === path);
   }
 
-  const getPixelDataFromId = (id: string) => pixelDataList.find((p) => p.id === id)
+  const removeDataFromPath = (path: string) => {
+    const new_data = dataList.filter((data) => data.path !== path);
+    setDataList(new_data);
+  }
 
-  const removePixelDataFromId = (id: string) => setPixelDataList(pixelDataList.filter((p) => p.id !== id))
+  const getDataFromId = (id: string) => dataList.find((data) => data.id === id)
 
-  const updatePixelDataFromId = (id: string, data: number[], pos: {x: number | null, y: number | null}) => setPixelDataList(pixelDataList.map((p) => p.id === id ? {...p, data, pos} : p))
+  const removeDataFromId = (id: string) => setDataList(dataList.filter((data) => data.id !== id))
 
-  const moveUpPixelDataFromId = (id: string) => {
-    const data = getPixelDataFromId(id)
+  // const updateDataFromId = (id: string, data: number[], pos: {x: number | null, y: number | null}) => setDataList(dataList.map((p) => p.id === id ? {...p, data, pos} : p))
+
+  const updateDataFromId = (id: string, newData : {data?: number[], pos?: {x: number | null, y: number | null}}) => {
+    setDataList(dataList.map((p) => p.id === id ? {...p, ...newData} : p))
+  } 
+
+
+  const moveUpDataFromId = (id: string) => {
+    const data = getDataFromId(id)
     if (data) {
-      removePixelDataFromId(id)
-      setPixelDataList(prev => [...prev, data])
+      removeDataFromId(id)
+      setDataList(prev => [...prev, data])
     }
   }
 
   const value = {
-    pixelDataList,
+    dataList,
     isPixelGetActivated,
     activatePixelGet,
     deactivatePixelGet,
-    addPixelData,
-    getAllPixelDataFromPath,
-    removePixelDataFromPath,
-    getPixelDataFromId,
-    removePixelDataFromId,
-    updatePixelDataFromId,
-    moveUpPixelDataFromId,
-    areaDataList,
-    addAreaData,
-    getAreaDataFromId,
-    removeAreaDataFromId
+    addData,
+    getAllDataFromPath,
+    removeDataFromPath,
+    getDataFromId,
+    removeDataFromId,
+    updateDataFromId,
+    moveUpDataFromId,
   }
   return (
     <ToolsBarContext.Provider value={value}>

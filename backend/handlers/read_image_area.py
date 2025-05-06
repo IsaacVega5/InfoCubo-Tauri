@@ -39,7 +39,7 @@ async def read_image_area(path, rotation = 0, area = {'x1': 0, 'y1': 0, 'x2': 0,
     'id' : str(uuid.uuid4()),
     'path': path,
     'rotation': rotation,
-    'cords': {
+    'coords': {
       'x1': min_x,
       'y1': min_y,
       'x2': max_x,
