@@ -115,7 +115,7 @@ export default function DataGetHandler() {
       'rotation': currentImage!.rotation,
       'area': area
     });
-    console.table(area)
+    
     addProcess(wsEvents.READ_IMAGE_AREA)
     setMouseSelectedArea({ x1: null, y1: null, x2: null, y2: null })
   }
