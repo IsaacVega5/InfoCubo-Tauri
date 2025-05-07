@@ -15,7 +15,7 @@ export default function PixelLocation({id, x, y, text, selected}: {id:string,x: 
       onClick={handleClick}
       >
       <MdMyLocation />
-      {selected && <MdMyLocation className="absolute animate-ping"/>}
+      {selected && <MdMyLocation className="absolute animate-ping-on-start"/>}
       {text && <p className="text-xs absolute flex items-center translate-y-1/1 whitespace-nowrap">{text}</p>}
     </button>
   )

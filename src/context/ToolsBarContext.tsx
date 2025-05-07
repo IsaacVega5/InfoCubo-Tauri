@@ -1,30 +1,10 @@
-import { createContext, useEffect, useState } from "react";
-
-// export interface pixelData {
-//   id: string,
-//   path: string,
-//   data: number[],
-//   coords: {x: number, y: number},
-//   pos: {x: number | null, y: number | null},
-//   rotation: number
-// }
+import { createContext, useState } from "react";
 
 export interface multiDataData {
   mean: number[],
   min: number[],
   max: number[],
 }
-
-// export interface areaData {
-//   id: string,
-//   path: string,
-//   data: multiDataData,
-//   pos : {x: number | null, y: number | null},
-//   coords : {x1: number, y1: number, x2: number, y2: number},
-//   rotation: number
-// }
-
-
 
 export interface dataListElement {
   type: 'pixel' | 'area',
@@ -35,7 +15,6 @@ export interface dataListElement {
   pos: {x: number | null, y: number | null},
   rotation: number
 }
-
 
 export const ToolsBarContext = createContext<{
   dataList: dataListElement[],
@@ -76,10 +55,6 @@ export function ToolsBarProvider({ children } : any) {
     }])
   }
 
-  useEffect(() => {
-    console.log(dataList)
-  }, [dataList])
-
   const getAllDataFromPath = (path: string) => {
     return dataList.filter((data) => data.path === path);
   }
@@ -93,12 +68,9 @@ export function ToolsBarProvider({ children } : any) {
 
   const removeDataFromId = (id: string) => setDataList(dataList.filter((data) => data.id !== id))
 
-  // const updateDataFromId = (id: string, data: number[], pos: {x: number | null, y: number | null}) => setDataList(dataList.map((p) => p.id === id ? {...p, data, pos} : p))
-
   const updateDataFromId = (id: string, newData : {data?: number[], pos?: {x: number | null, y: number | null}}) => {
     setDataList(dataList.map((p) => p.id === id ? {...p, ...newData} : p))
   } 
-
 
   const moveUpDataFromId = (id: string) => {
     const data = getDataFromId(id)

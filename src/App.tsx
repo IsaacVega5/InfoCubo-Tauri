@@ -71,8 +71,6 @@ function App() {
     })
 
     subscribe(wsEvents.READ_IMAGE_AREA, (data:any) => {
-      console.log("READ_IMAGE_AREA",data);
-      
       addData(
         data.id, 
         data.path, 

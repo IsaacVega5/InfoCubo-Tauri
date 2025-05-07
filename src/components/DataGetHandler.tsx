@@ -10,7 +10,6 @@ import { wsEvents } from "../constants/wsEvents"
 import { useLoader } from "../hooks/useLoader"
 import { listen } from "@tauri-apps/api/event"
 import { event } from "@tauri-apps/api"
-import Chart from "./Chart"
 import SelectedArea from "./SelectedArea"
 import ChartView from "./ChartView"
 import AreaLocation from "./AreaLocation"
@@ -90,7 +89,6 @@ export default function DataGetHandler() {
     addProcess(wsEvents.READ_IMAGE_PIXEL)
   }
   const longPress = (event: React.MouseEvent<HTMLElement>) => {
-    console.log('longpress');
     const bcr = selfRef.current!.getBoundingClientRect()
     const x = event.clientX - bcr.left
     const y = event.clientY - bcr.top
@@ -103,7 +101,6 @@ export default function DataGetHandler() {
   }
   const onPressStop = () => {
     setIsMouseHold(false)
-    console.log("PRESS STOP");
     if (!mouseSelectedArea.x1 || !mouseSelectedArea.y1 || !mouseSelectedArea.x2 || !mouseSelectedArea.y2) return
 
     const area = {
@@ -118,7 +115,7 @@ export default function DataGetHandler() {
       'rotation': currentImage!.rotation,
       'area': area
     });
-    
+    console.table(area)
     addProcess(wsEvents.READ_IMAGE_AREA)
     setMouseSelectedArea({ x1: null, y1: null, x2: null, y2: null })
   }
@@ -160,29 +157,36 @@ export default function DataGetHandler() {
         {
           currentDataList.length > 0 && (
             currentDataList.map((data: dataListElement, index: number) => {
-              console.log(data);
-              
-              if (currentImage?.rotation === data.rotation && currentImage.path === data.path) return (
-                data.type === 'pixel' 
-                ?  <PixelLocation
-                    key={`pxl-${data.id}`}
-                    id={data.id}
-                    x={(data.coords as { x: number, y: number }).x * imgOffSet.ratio + imgOffSet.left}
-                    y={(data.coords as { x: number, y: number }).y * imgOffSet.ratio + imgOffSet.top}
-                    selected={index === currentDataList.length - 1}
-                    text={`${(data.coords as { x: number, y: number }).x}, ${(data.coords as { x: number, y: number }).y}`} 
+              if (currentImage?.rotation === data.rotation && currentImage.path === data.path){
+                if ( data.type === 'pixel') {
+                  const { x, y } = data.coords as { x: number, y: number };
+                    return (
+                      <PixelLocation
+                        key={`pxl-${data.id}`}
+                        id={data.id}
+                        x={x * imgOffSet.ratio + imgOffSet.left}
+                        y={y * imgOffSet.ratio + imgOffSet.top}
+                        selected={index === currentDataList.length - 1}
+                        text={`${x}, ${y}`} 
+                      />
+                    )
+                }
+                else { 
+                  const { x1, y1, x2, y2 } = data.coords as { x1: number, y1: number, x2: number, y2: number };
+                  return (
+                    <AreaLocation
+                      key= {`area-${data.id}`}
+                      id = {data.id}
+                      text="Area"
+                      selected={index === currentDataList.length - 1}
+                      x1 = {x1 * imgOffSet.ratio + imgOffSet.left}
+                      y1 = {y1 * imgOffSet.ratio + imgOffSet.top}
+                      x2 = {x2 * imgOffSet.ratio + imgOffSet.left}
+                      y2 = {y2 * imgOffSet.ratio + imgOffSet.top}
                     />
-                : <AreaLocation
-                  key= {`area-${data.id}`}
-                  id = {data.id}
-                  text="Area"
-                  selected={index === currentDataList.length - 1}
-                  x1 = {(data.coords as { x1: number, y1: number, x2: number, y2: number }).x1 * imgOffSet.ratio + imgOffSet.left}
-                  y1 = {(data.coords as { x1: number, y1: number, x2: number, y2: number }).y1 * imgOffSet.ratio + imgOffSet.top}
-                  x2 = {(data.coords as { x1: number, y1: number, x2: number, y2: number }).x2 * imgOffSet.ratio + imgOffSet.left}
-                  y2 = {(data.coords as { x1: number, y1: number, x2: number, y2: number }).y2 * imgOffSet.ratio + imgOffSet.top}
-                  />
-              )
+                  )
+                }
+              } 
             })
           )
         }
@@ -193,7 +197,7 @@ export default function DataGetHandler() {
                 key={`chart-${data.id}`}
                 id={data.id}
                 parentRef={selfRef}
-                title="Data"
+                title={data.type === 'area' ? "Area" : "Pixel"}
                 dataList={data.type === 'area' ? [{
                   title: "min",
                   data: (data.data as multiDataData).min,

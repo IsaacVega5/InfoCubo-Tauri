@@ -122,8 +122,6 @@ export default function ChartView({ id, parentRef, title, dataList }: Props) {
     })
     if (!chart.current) return
     dataList.forEach((data) => {
-      console.log(data);
-      
       if (!chart.current) return
       const newSeries = chart.current.addSeries(LineSeries,{
         lineStyle: data.style?.lineStyle || 0,

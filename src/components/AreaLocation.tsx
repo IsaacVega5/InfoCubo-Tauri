@@ -20,13 +20,13 @@ export default function AreaLocation({id, x1, y1, x2, y2, text, selected}: {id:s
   const styleSelected = selected ? "text-primary" : "text-white"
   const styleDivSelected = selected ? "border-primary bg-primary/30" : "border-white bg-white/30"
   return (
-    <button className={"flex flex-row gap-1 items-center -translate-1/2 absolute justify-center select-none" + " " + styleSelected}
+    <button className={"flex flex-row gap-1 items-center absolute justify-center select-none" + " " + styleSelected}
       style={{left: x, top: y, width: width, height: height}}
       onClick={handleClick}
      >
       
       <div className={"w-full h-full border-1" + " " + styleDivSelected} />
-      {selected && <div className={"absolute w-full h-full border-1 border-primary animate-ping-light"}/>}
+      {selected && <div className={"absolute w-full h-full border-1 border-primary animate-ping-light-on-start"}/>}
       
       {text && <p className="text-xs absolute flex items-center translate-y-1/1 whitespace-nowrap">{text}</p>}
     </button>
