@@ -18,15 +18,29 @@ async def read_image_area(path, rotation = 0, area = {'x1': 0, 'y1': 0, 'x2': 0,
   if rotation != 0:
     image = tf.rotate_matrix(image, float(rotation) *-1)
   
+  # min_y = min(area['y1'], area['y2'])
+  # max_y = max(area['y1'], area['y2'])
+  # min_x = min(area['x1'], area['x2'])
+  # max_x = max(area['x1'], area['x2'])
+  print(area)
+  for coord in area.keys():
+    if area[coord] < 0: area[coord] = 0
+    if coord[0] == 'x':
+      if area[coord] > image.shape[1]: area[coord] = image.shape[1]
+    elif coord[0] == 'y':
+      if area[coord] > image.shape[0]: area[coord] = image.shape[0]
+  
   min_y = min(area['y1'], area['y2'])
   max_y = max(area['y1'], area['y2'])
   min_x = min(area['x1'], area['x2'])
   max_x = max(area['x1'], area['x2'])
-  
-  min_y = min_y if min_y >= 0 else 0
-  max_y = max_y if max_y < image.shape[0] else image.shape[0]
-  min_x = min_x if min_x >= 0 else 0
-  max_x = max_x if max_x < image.shape[1] else image.shape[1]
+ 
+  print(min_y, max_y, min_x, max_x)
+  print(image.shape[0], image.shape[1])
+  if min_y == max_y or min_x == max_x:
+    return {
+      'error': 'Invalid area'
+    }
   
   image = image[min_y:max_y, min_x:max_x]
   mean_list, min_list, max_list = [], [], []

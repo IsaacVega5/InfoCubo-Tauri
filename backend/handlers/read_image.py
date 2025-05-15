@@ -40,6 +40,9 @@ async def read_image(path, band = 0, rotation = 0,request = None):
     'band': band,
     'rotation': rotation,
     'metadata': metadata,
-    'size': image.shape
+    'size': {
+      'width': image.shape[1],
+      'height': image.shape[0]
+    }
   }
   

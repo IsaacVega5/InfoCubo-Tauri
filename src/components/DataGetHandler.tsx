@@ -63,28 +63,45 @@ export default function DataGetHandler() {
 
   }
 
+  const getContainerAndImageSizes = () => {
+    if (!currentImage) return { container: null, image: null }
+
+    const bcr = selfRef.current?.getBoundingClientRect()
+    if (!bcr) return { container: null, image: null }
+
+    const imgSize = { width: currentImage.size.width, height: currentImage.size.height}
+    const newSize = get_new_size({ imageSize: [imgSize.width, imgSize.height], newSize: [bcr.width, bcr.height] })
+    
+    const container = { left: bcr.left, top: bcr.top, width: bcr.width, height: bcr.height }
+    const image = { width: newSize.width, height: newSize.height }
+    return { container: container, image : image, ratio: newSize.ratio }
+  }
+
   const press = (event: React.MouseEvent<HTMLElement>) => {
     if (!currentImage) return
     if (!isPixelGetActivated(currentImage?.path)) return
 
-    const bcr = selfRef.current?.getBoundingClientRect()
-    if (!bcr) return
-    const size = { width: bcr.width, height: bcr.height }
-    const imgSize = { width: currentImage.size[1], height: currentImage.size[0] }
-    const new_size = get_new_size({ imageSize: [imgSize.width, imgSize.height], newSize: [size.width, size.height] })
+    // const bcr = selfRef.current?.getBoundingClientRect()
+    // if (!bcr) return
+    // const size = { width: bcr.width, height: bcr.height }
+    // const imgSize = { width: currentImage.size[1], height: currentImage.size[0] }
+    // const new_size = get_new_size({ imageSize: [imgSize.width, imgSize.height], newSize: [size.width, size.height] })
+
+    const { container, image } = getContainerAndImageSizes()
+    if (!container || !image) return
 
     const imgCoords = {
-      x: (event.clientX - bcr.left) - imgOffSet.left,
-      y: (event.clientY - bcr.top) - imgOffSet.top
+      x: (event.clientX - container.left) - imgOffSet.left,
+      y: (event.clientY - container.top) - imgOffSet.top
     }
     if (imgCoords.x < 0 || imgCoords.y < 0) return
-    if (imgCoords.x > new_size.width || imgCoords.y > new_size.height) return
+    if (imgCoords.x > image.width || imgCoords.y > image.height) return
 
     sendMessage(wsEvents.READ_IMAGE_PIXEL, {
       'path': currentImage.path,
       'rotation': currentImage.rotation,
-      'x': Math.floor(imgCoords.x / new_size.ratio),
-      'y': Math.floor(imgCoords.y / new_size.ratio)
+      'x': Math.floor(imgCoords.x / imgOffSet.ratio),
+      'y': Math.floor(imgCoords.y / imgOffSet.ratio)
     });
     addProcess(wsEvents.READ_IMAGE_PIXEL)
   }
@@ -127,17 +144,12 @@ export default function DataGetHandler() {
   })
 
   const setImageOffsetForPixels = () => {
-    if (!currentImage) return
-    const bcr = selfRef.current?.getBoundingClientRect()
-    if (!bcr) return
-    const size = { width: bcr.width, height: bcr.height }
-    const imgSize = { width: currentImage.size[1], height: currentImage.size[0] }
-    const new_size = get_new_size({ imageSize: [imgSize.width, imgSize.height], newSize: [size.width, size.height] })
-
+    const { container, image, ratio } = getContainerAndImageSizes()
+    if (!container || !image) return
     setImgOffSet({
-      left: (size.width - new_size.width) / 2,
-      top: (size.height - new_size.height) / 2,
-      ratio: new_size.ratio
+      left: (container.width - image.width) / 2,
+      top: (container.height - image.height) / 2,
+      ratio: ratio
     }
     )
   }
