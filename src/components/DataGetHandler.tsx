@@ -185,11 +185,13 @@ export default function DataGetHandler() {
                 }
                 else { 
                   const { x1, y1, x2, y2 } = data.coords as { x1: number, y1: number, x2: number, y2: number };
+                  const min = `${Math.min(x1, x2)}\t${Math.min(y1, y2)}`;
+                  const max = `${Math.max(x1, x2)}\t${Math.max(y1, y2)}`;
                   return (
                     <AreaLocation
                       key= {`area-${data.id}`}
                       id = {data.id}
-                      text="Area"
+                      text={{min: min, max: max}}
                       selected={index === currentDataList.length - 1}
                       x1 = {x1 * imgOffSet.ratio + imgOffSet.left}
                       y1 = {y1 * imgOffSet.ratio + imgOffSet.top}
