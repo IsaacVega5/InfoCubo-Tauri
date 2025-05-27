@@ -18,7 +18,7 @@ export default function Chart({ id, parentRef, title, data }: Props) {
   const contChartRef = useRef<HTMLDivElement | null>(null)
   const selfChart = useRef<HTMLDivElement | null>(null)
   const chart = useRef<IChartApi | null>(null)
-  const { removePixelDataFromId, moveUpPixelDataFromId, updatePixelDataFromId, getPixelDataFromId } = useToolBar();
+  const { removeDataFromId, moveUpDataFromId, updateDataFromId, getDataFromId } = useToolBar();
 
   const handleMouseMove = (e: globalThis.MouseEvent) => {
     if (!parentRef.current || !holding) return
@@ -33,13 +33,13 @@ export default function Chart({ id, parentRef, title, data }: Props) {
       x: new_x < 0 ? 0 : new_x,
       y: new_y < 0 ? 0 : new_y
     })
-    updatePixelDataFromId(id, data, {x: new_x, y: new_y})
+    updateDataFromId(id, {data:data, pos:{x: new_x, y: new_y}})
   }
 
 
   useEffect(() => {
     if (!selfRef.current) return
-    const dataPos = getPixelDataFromId(id)?.pos
+    const dataPos = getDataFromId(id)?.pos
     if (!dataPos) return
     setWindowPos({x: dataPos?.x, y: dataPos?.y})
   }, [])
@@ -52,7 +52,7 @@ export default function Chart({ id, parentRef, title, data }: Props) {
     const y = e.clientY - bcr.top
     setMousePos({ x, y })
 
-    moveUpPixelDataFromId(id)
+    moveUpDataFromId(id)
   }
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function Chart({ id, parentRef, title, data }: Props) {
   }, [contChartRef, selfChart])
 
   const handleClose = () => {
-    removePixelDataFromId(id)
+    removeDataFromId(id)
   }
 
   return (
@@ -160,7 +160,7 @@ export default function Chart({ id, parentRef, title, data }: Props) {
       <div className="flex flex-col flex-1 overflow-hidden pr-2"
         onClick={(e) =>{
           e.stopPropagation()
-          moveUpPixelDataFromId(id)
+          moveUpDataFromId(id)
         }}
       >
         <div ref={contChartRef} className="flex flex-1 bg-custom-black">
