@@ -22,12 +22,15 @@ export default function ToolsBar() {
   }
 
   const handleRotationChange = (value: number) => {
-    if (!currentImage) return
-    sendMessage('read_image', {
-      'path': currentImage.path,
-      'band': currentImage.band,
-      'rotation': value,
-    });
+    const sendMessageRotation = setTimeout(() => {
+      if (!currentImage) return
+      sendMessage('read_image', {
+        'path': currentImage.path,
+        'band': currentImage.band,
+        'rotation': value,
+      });
+    }, 500)
+    return () => clearTimeout(sendMessageRotation)
   }
 
   const handlePixelGetActivateClick = (value: boolean) => {
