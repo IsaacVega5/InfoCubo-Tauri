@@ -1,10 +1,12 @@
-import uuid
-from spectral import get_rgb
 import cv2
+import numpy as np
 import spectral.io.envi as envi
-from utils.helpers import get_metadata
-import utils.transformation as tf
 from cache import image_cache
+from spectral import get_rgb
+
+import utils.transformation as tf
+from utils.helpers import get_metadata
+
 
 async def read_image(path, band = 0, rotation = 0,request = None):
   metadata = get_metadata(path)
@@ -12,13 +14,22 @@ async def read_image(path, band = 0, rotation = 0,request = None):
   image = envi.open(path, path.replace('.hdr', ''))
   
   try:
-    image = image.read_band(band) if band != 'RGB' else get_rgb(image)
-  except:
+    if band == 'RGB':
+      if image.shape[2] and image.shape[2] >= 118:
+        image = get_rgb(image, bands=[118,51,24])
+      else:
+        image = get_rgb(image)
+    else:
+      image = image.read_band(band)  
+  except Exception as e:
+    print(f"Error reading image: {e}")
     return {
       'error': 'Error reading image'
     }
   
   image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+  if band == 'RGB':
+    image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_BGR2RGB)
   
   if rotation != 0:
     image = tf.rotate_matrix(image, float(rotation) *-1)
