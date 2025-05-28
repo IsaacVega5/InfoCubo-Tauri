@@ -1,16 +1,18 @@
 import uuid
-from spectral import get_rgb
-import spectral.io.envi as envi
-from utils.helpers import get_metadata
-import utils.transformation as tf
+
 import numpy as np
+import spectral.io.envi as envi
+
+import utils.transformation as tf
+
 
 async def read_image_area(path, rotation = 0, area = {'x1': 0, 'y1': 0, 'x2': 0, 'y2': 0}, request = None):
   image = envi.open(path, path.replace('.hdr', ''))
   
   try:
     image = image.load()
-  except:
+  except Exception as e:
+    print(f"Error reading image: {e}")
     return {
       'error': 'Error reading image'
     }
@@ -18,25 +20,21 @@ async def read_image_area(path, rotation = 0, area = {'x1': 0, 'y1': 0, 'x2': 0,
   if rotation != 0:
     image = tf.rotate_matrix(image, float(rotation) *-1)
   
-  # min_y = min(area['y1'], area['y2'])
-  # max_y = max(area['y1'], area['y2'])
-  # min_x = min(area['x1'], area['x2'])
-  # max_x = max(area['x1'], area['x2'])
-  print(area)
   for coord in area.keys():
-    if area[coord] < 0: area[coord] = 0
+    if area[coord] < 0: 
+      area[coord] = 0
     if coord[0] == 'x':
-      if area[coord] > image.shape[1]: area[coord] = image.shape[1]
+      if area[coord] > image.shape[1]: 
+        area[coord] = image.shape[1]
     elif coord[0] == 'y':
-      if area[coord] > image.shape[0]: area[coord] = image.shape[0]
+      if area[coord] > image.shape[0]: 
+        area[coord] = image.shape[0]
   
   min_y = min(area['y1'], area['y2'])
   max_y = max(area['y1'], area['y2'])
   min_x = min(area['x1'], area['x2'])
   max_x = max(area['x1'], area['x2'])
  
-  print(min_y, max_y, min_x, max_x)
-  print(image.shape[0], image.shape[1])
   if min_y == max_y or min_x == max_x:
     return {
       'error': 'Invalid area'
