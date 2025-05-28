@@ -3,30 +3,44 @@ import { MdOutlineRotateLeft, MdOutlineRotateRight } from "react-icons/md";
 
 export default function RotateInput({onChange, disabled}: {onChange?: (value: number) => void, disabled?: boolean}) {
   const [inputValue, setInputValue] = useState("0.0");
-  const regex = /^[0-9]*\.[0-9]$/;
+  const regex = /^$|[0-9]*\.?[0-9]?$/
   const disabledStyle = disabled ? 'opacity-50' : 'hover:brightness-125 hover:bg-custom-black';
   
   useEffect(() => {
-    if (onChange) onChange(parseFloat(inputValue));
+    if (onChange) {
+      const input =  parseFloat(inputValue);
+      const value = isNaN(input) ? 0 : input
+      onChange(parseFloat(value.toFixed(1)));
+    };
   }, [inputValue]);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!regex.test(e.target.value)) {
+
+  const evaluateInput = (value: string) =>{
+    if (!regex.test(value)) {
       return;
     }
-    if (e.target.value === "") {
-      setInputValue("0.0");
-      return;
+    if (value.trim() === ".") {
+      setInputValue("0.");
+      return
     }
-    if (parseFloat(e.target.value) > 360) {
+    if (parseFloat(value) > 360) {
       setInputValue("360.0");
       return;
     }
-    if (parseFloat(e.target.value) < -360) {
+    if (parseFloat(value) < -360) {
       setInputValue("-360.0");
       return;
     }
-    setInputValue(e.target.value);
+    setInputValue(value);
+  }
+
+  const handleBlur = () => {
+    if (disabled) return
+    if (inputValue.trim() === "") {
+      setInputValue("0.0");
+    }
+    else{
+      setInputValue(parseFloat(inputValue).toFixed(1).toString());
+    }
   }
 
   const handleLeftClick = () => {
@@ -68,7 +82,8 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
       >
         <MdOutlineRotateLeft />
       </button>
-      <input disabled={disabled} type="text" className="bg-custom-lighter-black px-2 rounded-md w-17 h-full font-mono text-end" value={disabled ? "0.0" : inputValue} onChange={handleChange} 
+      <input disabled={disabled} type="text" className="bg-custom-lighter-black px-2 rounded-md w-17 h-full font-mono text-end" value={disabled ? "0.0" : inputValue} onChange={(e) => evaluateInput(e.target.value)} 
+      onBlur={handleBlur}
       style={{
         color : disabled ? "grey" : "white"
       }}
