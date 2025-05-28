@@ -43,8 +43,8 @@ export default function AreaLocation({id, x1, y1, x2, y2, text, selected}: IArea
       <div className={`absolute h-1 w-1 top-0 left-0 -translate-0.5 bg-primary ${styleDots}`}/>
       <div className={`absolute h-1 w-1 bottom-0 right-0 translate-0.5 bg-primary ${styleDots}`}/>
 
-      <span className="text-xs flex absolute -translate-x-1/2 -translate-y-full w-full justify-center text-nowrap">{text?.max}</span>
-      <span className="text-xs flex absolute left-1/2 top-1/1 justify-center text-nowrap  w-full">{text?.min}</span>
+      <span className="text-xs flex absolute -translate-x-1/2 -translate-y-full w-full justify-center text-nowrap">{text?.min}</span>
+      <span className="text-xs flex absolute left-1/2 top-1/1 justify-center text-nowrap  w-full">{text?.max}</span>
     </button>
   )
 }
