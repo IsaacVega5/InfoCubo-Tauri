@@ -3,14 +3,14 @@ import { MdOutlineRotateLeft, MdOutlineRotateRight } from "react-icons/md";
 
 export default function RotateInput({onChange, disabled}: {onChange?: (value: number) => void, disabled?: boolean}) {
   const [inputValue, setInputValue] = useState("0.0");
-  const regex = /^$|[0-9]*\.?[0-9]?$/
+  const regex = /^$|^[0-9]*\.?[0-9]{0,2}$/
   const disabledStyle = disabled ? 'opacity-50' : 'hover:brightness-125 hover:bg-custom-black';
   
   useEffect(() => {
     if (onChange) {
       const input =  parseFloat(inputValue);
       const value = isNaN(input) ? 0 : input
-      onChange(parseFloat(value.toFixed(1)));
+      onChange(parseFloat(value.toFixed(2)));
     };
   }, [inputValue]);
 
@@ -23,11 +23,11 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
       return
     }
     if (parseFloat(value) > 360) {
-      setInputValue("360.0");
+      setInputValue("360.00");
       return;
     }
     if (parseFloat(value) < -360) {
-      setInputValue("-360.0");
+      setInputValue("-360.00");
       return;
     }
     setInputValue(value);
@@ -36,7 +36,7 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
   const handleBlur = () => {
     if (disabled) return
     if (inputValue.trim() === "") {
-      setInputValue("0.0");
+      setInputValue("0.00");
     }
     else{
       setInputValue(parseFloat(inputValue).toFixed(1).toString());
@@ -54,7 +54,7 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
       setInputValue("0.0");
       return;
     }
-    setInputValue(value.toFixed(1).toString());
+    setInputValue(value.toFixed(2).toString());
   }
   const handleRightClick = () => {
     if (disabled) return
@@ -68,7 +68,7 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
       return;
     }
 
-    setInputValue(value.toFixed(1).toString());
+    setInputValue(value.toFixed(2).toString());
   }
 
   return (
