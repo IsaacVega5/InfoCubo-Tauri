@@ -89,7 +89,6 @@ export default function DataGetHandler() {
 
  
   const onPress = (event: React.MouseEvent<HTMLElement>) => {
-    console.log("onPress", event)
     setMouseState({
       pos: { x: event.clientX, y: event.clientY },
       Action: 'Press'
@@ -168,6 +167,12 @@ export default function DataGetHandler() {
     setMouseSelectedArea({ x1: null, y1: null, x2: null, y2: null })
   }
 
+  const coordsToText = (coords: { x: number, y: number } | { x1: number, y1: number, x2: number, y2: number }) => {
+    if ('x' in coords) {
+      return `${coords.x}, ${coords.y}`
+    }
+    return `${Math.min(coords.x1, coords.x2)}, ${Math.min(coords.y1, coords.y2)} - ${Math.max(coords.x1, coords.x2)}, ${Math.max(coords.y1, coords.y2)}`
+  }
 
   return (
 
@@ -222,7 +227,7 @@ export default function DataGetHandler() {
                 key={`chart-${data.id}`}
                 id={data.id}
                 parentRef={selfRef}
-                title={data.type === 'area' ? "Area" : "Pixel"}
+                title={ `${data.type[0].toUpperCase() + data.type.slice(1)} | ${coordsToText(data.coords)}`}
                 dataList={data.type === 'area' ? [{
                   title: "min",
                   data: (data.data as multiDataData).min,
