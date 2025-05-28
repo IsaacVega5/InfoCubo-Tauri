@@ -1,6 +1,5 @@
-import { lazy, useEffect, useRef, useState } from "react"
-import useLongPress from "../hooks/useLongPress"
-import { pixelData } from "../context/ToolsBarContext"
+import { useEffect, useRef, useState } from "react"
+import { dataListElement, multiDataData } from "../context/ToolsBarContext"
 import { useImages } from "../hooks/useImages"
 import PixelLocation from "./PixelLocation"
 import useToolBar from "../hooks/useToolBar"
@@ -10,127 +9,239 @@ import { wsEvents } from "../constants/wsEvents"
 import { useLoader } from "../hooks/useLoader"
 import { listen } from "@tauri-apps/api/event"
 import { event } from "@tauri-apps/api"
-import Chart from "./Chart"
+import SelectedArea from "./SelectedArea"
+import ChartView from "./ChartView"
+import AreaLocation from "./AreaLocation"
 
+interface selectedArea {
+  x1: number | null
+  y1: number | null
+  x2: number | null
+  y2: number | null
+}
+interface MouseStateProps {
+  pos: { x: number, y: number }
+  Action: 'Release' | 'Press' | 'Move'
+}
 export default function DataGetHandler() {
   const { currentImage } = useImages()
-  const { isPixelGetActivated, pixelDataList } = useToolBar()
+  const { isPixelGetActivated, dataList } = useToolBar()
   const { sendMessage } = useWebSocket()
   const { addProcess } = useLoader()
-  const [currentPixelDataList, setCurrentPixelDataLista] = useState<pixelData[]>([])
-  const [imgOffSet, setImgOffSet] = useState({left: 0, top: 0, ratio: 1})
+  const [currentDataList, setCurrentDataList] = useState<dataListElement[]>([])
+  const [imgOffSet, setImgOffSet] = useState({ left: 0, top: 0, ratio: 1 })
   const selfRef = useRef<HTMLDivElement>(null)
-  const [isMouseHold, setIsMouseHold] = useState(false)
-  const [mouseSelectedArea, setMouseSelectedArea] = useState({x1: 0, y1: 0, x2: 0, y2: 0})
-
-
-  useEffect(() => {
-    if (!currentImage) return
-    const list = pixelDataList.filter(pixelData => (pixelData.path === currentImage.path))
-    setCurrentPixelDataLista(list)
-    
-  }, [currentImage, pixelDataList])
-
-  useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove)
-    return () => document.removeEventListener('mousemove', handleMouseMove)
-  }, [])
-  
-  const handleMouseMove = (e: MouseEvent) => {
-    const bcr = selfRef.current!.getBoundingClientRect()
-    const x = e.clientX - bcr.left
-    const y = e.clientY - bcr.top
-    if (
-      x < 0 || x > bcr.width ||
-      y < 0 || y > bcr.height
-    ) return
-  }
-  
-  const press = (event: React.MouseEvent<HTMLElement>) => {
-    if (!currentImage) return
-    if (!isPixelGetActivated(currentImage?.path)) return
-
-    const bcr = selfRef.current?.getBoundingClientRect()
-    if (!bcr) return
-    const size = {width: bcr.width, height: bcr.height}
-    const imgSize = {width: currentImage.size[1], height: currentImage.size[0]}
-    const new_size = get_new_size({imageSize: [imgSize.width, imgSize.height], newSize: [size.width, size.height]})
-
-    const imgCoords = {
-      x: (event.clientX - bcr.left) - imgOffSet.left, 
-      y: (event.clientY - bcr.top) - imgOffSet.top
-    }
-    if (imgCoords.x < 0 || imgCoords.y < 0) return
-    if (imgCoords.x > new_size.width || imgCoords.y > new_size.height) return 
-
-    sendMessage(wsEvents.READ_IMAGE_PIXEL, {
-      'path': currentImage.path,
-      'rotation': currentImage.rotation,
-      'x' : Math.floor(imgCoords.x / new_size.ratio),
-      'y' : Math.floor(imgCoords.y / new_size.ratio)
-    });
-    addProcess(wsEvents.READ_IMAGE_PIXEL)
-  }
-  const longpress = () => {
-    setMouseSelectedArea({x1: 0, y1: 0, x2: 0, y2: 0})
-  }
-  const { handlers } = useLongPress({
-    click: press,
-    longpress
+  const [mouseSelectedArea, setMouseSelectedArea] = useState<selectedArea>({ x1: null, y1: null, x2: null, y2: null })
+ 
+  const [mouseState, setMouseState] = useState<MouseStateProps>({
+    pos: { x: 0, y: 0 },
+    Action: 'Release'
   })
-  
-  const setImageOffsetForPixels = () => {
-    if (!currentImage) return
+
+  const getContainerAndImageSizes = () => {
+    if (!currentImage) return { container: null, image: null }
+
     const bcr = selfRef.current?.getBoundingClientRect()
-    if (!bcr) return
-    const size = {width: bcr.width, height: bcr.height}
-    const imgSize = {width: currentImage.size[1], height: currentImage.size[0]}
-    const new_size = get_new_size({imageSize: [imgSize.width, imgSize.height], newSize: [size.width, size.height]})
+    if (!bcr) return { container: null, image: null }
+
+    const imgSize = { width: currentImage.size.width, height: currentImage.size.height}
+    const newSize = get_new_size({ imageSize: [imgSize.width, imgSize.height], newSize: [bcr.width, bcr.height] })
     
+    const container = { left: bcr.left, top: bcr.top, width: bcr.width, height: bcr.height }
+    const image = { width: newSize.width, height: newSize.height }
+    return { container: container, image : image, ratio: newSize.ratio }
+  }
+
+  const setImageOffsetForPixels = () => {
+    const { container, image, ratio } = getContainerAndImageSizes()
+    if (!container || !image) return
     setImgOffSet({
-      left: (size.width - new_size.width) / 2,
-      top: (size.height - new_size.height) / 2,
-      ratio: new_size.ratio
+      left: (container.width - image.width) / 2,
+      top: (container.height - image.height) / 2,
+      ratio: ratio
     }
     )
   }
+  useEffect(() => {
+    if (!currentImage) return
+    const list = dataList.filter(data => (data.path === currentImage.path))
+    setCurrentDataList(list)
 
+  }, [currentImage, dataList])
   useEffect(() => {
     if (!currentImage) return
     setImageOffsetForPixels()
   }, [currentImage])
+  useEffect(() => {
+    document.addEventListener('mousemove', onMove)
+    return () => {
+      document.removeEventListener('mousemove', onMove)
+    }
+  }, [mouseState])
+  useEffect(() => {
+    document.addEventListener('mouseup', onRelease)
+    return () => {
+      document.removeEventListener('mouseup', onRelease)
+    }
+  }, [mouseState])
 
   listen(event.TauriEvent.WINDOW_RESIZED, () => setImageOffsetForPixels())
-  
+
+ 
+  const onPress = (event: React.MouseEvent<HTMLElement>) => {
+    setMouseState({
+      pos: { x: event.clientX, y: event.clientY },
+      Action: 'Press'
+    })
+  }
+  const onMove = (event: MouseEvent) => {
+    if (mouseState.Action === 'Release') return
+
+    const { container } = getContainerAndImageSizes()
+    if (!container) return
+    
+    const x = event.clientX - container.left
+    const y = event.clientY - container.top
+
+    if (
+      x < 0 || x > container.width ||
+      y < 0 || y > container.height
+    ) return
+    
+    if (!mouseSelectedArea.x1) {
+      setMouseSelectedArea({ x1: x, y1: y, x2: x, y2: y })
+    }else{
+      setMouseSelectedArea(prev => ({ ...prev, x2: x, y2: y }))
+    }
+    setMouseState({
+      pos: { x: event.clientX, y: event.clientY },
+      Action: 'Move'
+    })
+  }
+  const onRelease = (event: MouseEvent) => {
+    if (!currentImage) return
+    if (!isPixelGetActivated(currentImage?.path)) return
+    
+    if (mouseState.Action === 'Move') {
+      if (!mouseSelectedArea.x1 || !mouseSelectedArea.y1 || !mouseSelectedArea.x2 || !mouseSelectedArea.y2) return
+
+      const area = {
+        'x1': Math.floor((mouseSelectedArea.x1 - imgOffSet.left) / imgOffSet.ratio),
+        'y1': Math.floor((mouseSelectedArea.y1 - imgOffSet.top) / imgOffSet.ratio),
+        'x2': Math.floor((mouseSelectedArea.x2 - imgOffSet.left) / imgOffSet.ratio),
+        'y2': Math.floor((mouseSelectedArea.y2 - imgOffSet.top) / imgOffSet.ratio)
+      }
+
+      sendMessage(wsEvents.READ_IMAGE_AREA, {
+        'path': currentImage!.path,
+        'rotation': currentImage!.rotation,
+        'area': area
+      });
+      
+      addProcess(wsEvents.READ_IMAGE_AREA)
+      setMouseSelectedArea({ x1: null, y1: null, x2: null, y2: null })
+    }
+    else if (mouseState.Action === 'Press') {
+      const { container, image } = getContainerAndImageSizes()
+      if (!container || !image) return
+
+      const imgCoords = {
+        x: (event.clientX - container.left) - imgOffSet.left,
+        y: (event.clientY - container.top) - imgOffSet.top
+      }
+      if (imgCoords.x < 0 || imgCoords.y < 0) return
+      if (imgCoords.x > image.width || imgCoords.y > image.height) return
+
+      sendMessage(wsEvents.READ_IMAGE_PIXEL, {
+        'path': currentImage.path,
+        'rotation': currentImage.rotation,
+        'x': Math.floor(imgCoords.x / imgOffSet.ratio),
+        'y': Math.floor(imgCoords.y / imgOffSet.ratio)
+      });
+      addProcess(wsEvents.READ_IMAGE_PIXEL)
+    }
+    setMouseState({
+      pos: { x: 0, y: 0 },
+      Action: 'Release'
+    })
+    setMouseSelectedArea({ x1: null, y1: null, x2: null, y2: null })
+  }
+
+  const coordsToText = (coords: { x: number, y: number } | { x1: number, y1: number, x2: number, y2: number }) => {
+    if ('x' in coords) {
+      return `${coords.x}, ${coords.y}`
+    }
+    return `${Math.min(coords.x1, coords.x2)}, ${Math.min(coords.y1, coords.y2)} - ${Math.max(coords.x1, coords.x2)}, ${Math.max(coords.y1, coords.y2)}`
+  }
+
   return (
 
     <div ref={selfRef} className="h-full w-full absolute">
-      <div className="h-full w-full absolute" {...handlers}></div>
+      <div className="h-full w-full absolute top-0 left-0" onMouseDown={onPress}></div>
       <div className="h-full w-full">
         {
-          currentPixelDataList.length > 0 && (
-            currentPixelDataList.map((pixelData : pixelData, index : number) => {
-              if (currentImage?.rotation === pixelData.rotation && currentImage.path === pixelData.path) return (
-                <PixelLocation 
-                  key={`pxl-${pixelData.id}`} 
-                  id={pixelData.id} 
-                  x={pixelData.coord.x * imgOffSet.ratio + imgOffSet.left} 
-                  y={pixelData.coord.y * imgOffSet.ratio + imgOffSet.top} 
-                  selected={index === currentPixelDataList.length - 1} 
-                  text={`${pixelData.coord.x}, ${pixelData.coord.y}`}/>
-              )
+          (mouseState.Action === 'Move') && <SelectedArea position={mouseSelectedArea} />
+        }
+        {
+          currentDataList.length > 0 && (
+            currentDataList.map((data: dataListElement, index: number) => {
+              if (currentImage?.rotation === data.rotation && currentImage.path === data.path){
+                if ( data.type === 'pixel') {
+                  const { x, y } = data.coords as { x: number, y: number };
+                    return (
+                      <PixelLocation
+                        key={`pxl-${data.id}`}
+                        id={data.id}
+                        x={x * imgOffSet.ratio + imgOffSet.left}
+                        y={y * imgOffSet.ratio + imgOffSet.top}
+                        selected={index === currentDataList.length - 1}
+                        text={`${x}, ${y}`} 
+                      />
+                    )
+                }
+                else { 
+                  const { x1, y1, x2, y2 } = data.coords as { x1: number, y1: number, x2: number, y2: number };
+                  const min = `${Math.min(x1, x2)}\t${Math.min(y1, y2)}`;
+                  const max = `${Math.max(x1, x2)}\t${Math.max(y1, y2)}`;
+                  return (
+                    <AreaLocation
+                      key= {`area-${data.id}`}
+                      id = {data.id}
+                      text={{min: min, max: max}}
+                      selected={index === currentDataList.length - 1}
+                      x1 = {x1 * imgOffSet.ratio + imgOffSet.left}
+                      y1 = {y1 * imgOffSet.ratio + imgOffSet.top}
+                      x2 = {x2 * imgOffSet.ratio + imgOffSet.left}
+                      y2 = {y2 * imgOffSet.ratio + imgOffSet.top}
+                    />
+                  )
+                }
+              } 
             })
           )
         }
         {
-          currentPixelDataList.length > 0 && (
-            currentPixelDataList.map((pixelData : pixelData) => (
-              <Chart 
-                key={`chart-${pixelData.id}`} 
-                id={pixelData.id} 
-                parentRef={selfRef} 
-                title={`Data for: ${pixelData.coord.x}, ${pixelData.coord.y} with ${pixelData?.rotation}°`} 
-                data={pixelData.data} />
+          currentDataList.length > 0 && (
+            currentDataList.map((data: dataListElement) => (
+              <ChartView
+                key={`chart-${data.id}`}
+                id={data.id}
+                parentRef={selfRef}
+                title={ `${data.type[0].toUpperCase() + data.type.slice(1)} | ${coordsToText(data.coords)}`}
+                dataList={data.type === 'area' ? [{
+                  title: "min",
+                  data: (data.data as multiDataData).min,
+                  style: { color: '#339AF0', lineStyle: 1 }
+                }, {
+                  title: "max",
+                  data: (data.data as multiDataData).max,
+                  style: { color: '#FA5252', lineStyle: 1 }
+                }, {
+                  title: "mean",
+                  data: (data.data as multiDataData).mean,
+                }] : 
+                [{ data: data.data as number[] }]}
+              />
             ))
           )
         }

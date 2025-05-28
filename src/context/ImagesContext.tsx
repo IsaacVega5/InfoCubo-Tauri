@@ -21,7 +21,7 @@ export interface image {
   band: number | 'RGB';
   metadata: any;
   rotation: number;
-  size: [number, number];
+  size: { width: number, height: number };
 } 
 interface ImagesProviderProps {
   children: React.ReactNode;

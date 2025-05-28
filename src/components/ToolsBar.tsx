@@ -10,7 +10,7 @@ import { startTransition } from "react";
 export default function ToolsBar() {
   const { currentImage } = useImages()
   const { sendMessage } = useWebSocket()
-  const { activatePixelGet,deactivatePixelGet, removePixelDataFromPath, isPixelGetActivated } = useToolBar()
+  const { activatePixelGet,deactivatePixelGet, removeDataFromPath, isPixelGetActivated } = useToolBar()
 
   const handleRGBChange = (value: boolean) => {
     if (!currentImage) return
@@ -39,7 +39,7 @@ export default function ToolsBar() {
       }
     else {
       deactivatePixelGet(currentImage.path)
-      removePixelDataFromPath(currentImage.path)
+      removeDataFromPath(currentImage.path)
     }
   }
 

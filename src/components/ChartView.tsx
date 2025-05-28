@@ -3,14 +3,25 @@ import { MouseEvent, useEffect, useRef, useState } from "react";
 import { IoMdClose } from 'react-icons/io';
 import useToolBar from '../hooks/useToolBar';
 
+interface styleProps {
+  color? : string,
+  lineStyle? : number
+}
+
+interface data {
+  title?: string,
+  style?: styleProps,
+  data : number[]
+}
+
 interface Props {
   id: string,
   parentRef: React.RefObject<HTMLDivElement> ,
   title : string,
-  data : number[]
+  dataList : data[]
 }
 
-export default function Chart({ id, parentRef, title, data }: Props) {
+export default function ChartView({ id, parentRef, title, dataList }: Props) {
   const [holding, setHolding] = useState(false);
   const [windowPos, setWindowPos] = useState<{ x: number | null, y: number | null }>({ x: null, y: null});
   const [mousePos, setMousePos] = useState<{ x: number | null, y: number | null }>({ x: null, y: null});
@@ -33,7 +44,7 @@ export default function Chart({ id, parentRef, title, data }: Props) {
       x: new_x < 0 ? 0 : new_x,
       y: new_y < 0 ? 0 : new_y
     })
-    updateDataFromId(id, {data:data, pos:{x: new_x, y: new_y}})
+    updateDataFromId(id, {pos: {x: new_x, y: new_y}})
   }
 
 
@@ -110,24 +121,24 @@ export default function Chart({ id, parentRef, title, data }: Props) {
       borderColor: '#444'
     })
     if (!chart.current) return
-    const newSeries = chart.current.addSeries(LineSeries,{
-      lineStyle: 0,
-      lineWidth: 2,
-      lastValueVisible: false,
-      color: "#4ebf71",
-      priceLineVisible: false,
-      priceFormat:{
-        
-      },
-    });
-    const listValues = data
-    const list_data : AreaData[] = []
-    listValues.forEach((value, index) => {
-      list_data.push({ time: index as Time, value })
+    dataList.forEach((data) => {
+      if (!chart.current) return
+      const newSeries = chart.current.addSeries(LineSeries,{
+        lineStyle: data.style?.lineStyle || 0,
+        lineWidth: 2,
+        lastValueVisible: false,
+        color: data.style?.color || "#4ebf71",
+        priceLineVisible: false,
+        priceFormat:{},
+      });
+      const list_data : AreaData[] = []
+      data.data.forEach((value, index) => {
+        list_data.push({ time: index as Time, value })
+      })
+      newSeries.setData(list_data);
     })
-    newSeries.setData(list_data);
-    window.addEventListener('resize', handleResize);
 
+    window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
     }
@@ -163,6 +174,18 @@ export default function Chart({ id, parentRef, title, data }: Props) {
           moveUpDataFromId(id)
         }}
       >
+        <div className='flex flex-row gap-2 px-2 pb-2'>
+            {
+            dataList.map((data) => (
+              data.title ? (
+              <div className='flex flex-row gap-2 items-center' key={data.title}>
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: data.style?.color || "#4ebf71" }}></div>
+                <span className='text-xs'>{data.title}</span>
+              </div>
+              ) : null
+            ))
+            }
+        </div>
         <div ref={contChartRef} className="flex flex-1 bg-custom-black">
           <div ref={selfChart} />
         </div>

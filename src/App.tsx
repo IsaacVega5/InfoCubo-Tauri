@@ -22,7 +22,7 @@ function App() {
   const ws = useWebSocket()
   const appWindow = getCurrentWindow()
   const [showDropFile, setShowDropFile] = useState(false)
-  const { addPixelData } = useToolBar()
+  const { addData } = useToolBar()
   const { subscribe, unsubscribe } = useWebSocket()
   const { addProcess, removeProcess } = useLoader()
 
@@ -66,9 +66,19 @@ function App() {
 
   useEffect(() => {
     subscribe(wsEvents.READ_IMAGE_PIXEL, (data:any) => {
-      addPixelData(data.id, data.path, data.data, {x: data.x, y: data.y}, data.rotation)
+      addData(data.id, data.path, data.data, {x: data.x, y: data.y}, data.rotation, 'pixel')
       removeProcess(wsEvents.READ_IMAGE_PIXEL)
-      
+    })
+
+    subscribe(wsEvents.READ_IMAGE_AREA, (data:any) => {
+      addData(
+        data.id, 
+        data.path, 
+        data.data,
+        data.coords, 
+        data.rotation, 
+        'area')
+      removeProcess(wsEvents.READ_IMAGE_AREA)
     })
 
     return () => {
