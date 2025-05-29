@@ -1,8 +1,18 @@
 import { useEffect, useState } from "react";
 import { MdOutlineRotateLeft, MdOutlineRotateRight } from "react-icons/md";
 
-export default function RotateInput({onChange, disabled}: {onChange?: (value: number) => void, disabled?: boolean}) {
-  const [inputValue, setInputValue] = useState("0.0");
+interface Props {
+  onChange?: (value: number) => void,
+  disabled?: boolean
+}
+/**
+ * Component for an input field that allows users to enter a number between 0 and 360.
+ * 
+ * @param {Props} props - The props for the component.
+ * @returns {JSX.Element} - The JSX element representing the RotateInput component.
+ */
+export default function RotateInput({onChange, disabled}: Props): JSX.Element {
+  const [inputValue, setInputValue] = useState("0.00");
   const regex = /^$|^[0-9]*\.?[0-9]{0,2}$/
   const disabledStyle = disabled ? 'opacity-50' : 'hover:brightness-125 hover:bg-custom-black';
   
@@ -39,7 +49,7 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
       setInputValue("0.00");
     }
     else{
-      setInputValue(parseFloat(inputValue).toFixed(1).toString());
+      setInputValue(parseFloat(inputValue).toFixed(2).toString());
     }
   }
 
@@ -47,11 +57,11 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
     if (disabled) return
     const value = parseFloat(inputValue) - 1.0;
     if (value > 360) {
-      setInputValue("0.0");
+      setInputValue("0.00");
       return;
     }
     if (value < -360) {
-      setInputValue("0.0");
+      setInputValue("0.00");
       return;
     }
     setInputValue(value.toFixed(2).toString());
@@ -60,15 +70,42 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
     if (disabled) return
     const value = parseFloat(inputValue) + 1.0;
     if (value > 360) {
-      setInputValue("0.0");
+      setInputValue("0.00");
       return;
     }
     if (value < -360) {
-      setInputValue("0.0");
+      setInputValue("0.00");
       return;
     }
 
     setInputValue(value.toFixed(2).toString());
+  }
+  
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    let differenceValue = 0.1
+    if (event.shiftKey){
+      differenceValue = 1
+    }else if (event.ctrlKey){
+      differenceValue = 0.01
+    }
+
+    switch (event.key) {
+      case 'Enter':
+        handleBlur();
+        return
+      case 'ArrowLeft':
+        handleLeftClick();
+        return
+      case 'ArrowRight':
+        handleRightClick();
+        return
+      case 'ArrowUp':
+        setInputValue((parseFloat(inputValue) + differenceValue).toFixed(2).toString());
+        return
+      case 'ArrowDown':
+        setInputValue((parseFloat(inputValue) - differenceValue).toFixed(2).toString());
+        return
+    }
   }
 
   return (
@@ -87,6 +124,7 @@ export default function RotateInput({onChange, disabled}: {onChange?: (value: nu
       style={{
         color : disabled ? "grey" : "white"
       }}
+      onKeyUp={handleKeyPress}
       />
       <button onClick={handleRightClick} className={`flex p-2 bg-custom-black aspect-square items-center align-middle justify-center rounded-md ${disabledStyle}`}
         style = {{cursor : disabled ? 'default' : 'pointer'}}
