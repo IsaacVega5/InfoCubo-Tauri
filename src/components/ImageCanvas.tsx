@@ -1,20 +1,9 @@
-import React, { lazy, useEffect, useRef, useState  } from "react";
+import React, { lazy, useRef  } from "react";
 import { useImages } from "../hooks/useImages"
 import useToolBar from "../hooks/useToolBar";
 
 
 const DataGetHandler = lazy(() => import('./DataGetHandler'))
-
-interface MouseStateProps { 
-  pos: { x: number, y: number }, 
-  Action: 'Release' | 'Press' | 'Move' 
-}
-
-interface ImageStateProps {
-  zoom : number,
-  translation : { x: number, y: number }
-}
-
 export default function ImageCanvas() {
   const { currentImage, updateImage } = useImages()
   const { isPixelGetActivated} = useToolBar()
@@ -29,12 +18,31 @@ export default function ImageCanvas() {
     if (zoomValue < 1){
       zoomValue = 1
     }
+    let prevZoom = currentImage.zoom
+    let newZoom = zoomValue
     
+    const bcr = selfRef.current?.getBoundingClientRect()
+    if (!bcr) return
+    const mouseX = event.clientX - bcr.left + selfRef.current!.scrollLeft;
+    const mouseY = event.clientY - bcr.top + selfRef.current!.scrollTop;
+    
+    setTimeout(() => {
+      if (selfRef.current) {
+        selfRef.current.scrollLeft =
+        ( mouseX * newZoom) / prevZoom - (event.clientX - bcr.left);
+        selfRef.current.scrollTop =
+        (mouseY * newZoom) / prevZoom - (event.clientY - bcr.top);
+      }
+    }, 0);
     updateImage({...currentImage, zoom: zoomValue})
   }
 
   const handleScroll : React.UIEventHandler<HTMLDivElement> = (event) => {
     if (!currentImage) return
+    console.log(event.currentTarget.scrollLeft, event.currentTarget.scrollTop);
+    console.log(event.currentTarget.scrollWidth, event.currentTarget.scrollHeight);
+    console.log(event.currentTarget.clientWidth, event.currentTarget.clientHeight);
+    
     updateImage({...currentImage, translation: { x: event.currentTarget.scrollLeft, y: event.currentTarget.scrollTop }})
   }
 
