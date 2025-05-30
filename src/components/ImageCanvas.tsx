@@ -1,4 +1,4 @@
-import React, { lazy, useRef  } from "react";
+import React, { lazy, useEffect, useRef  } from "react";
 import { useImages } from "../hooks/useImages"
 import useToolBar from "../hooks/useToolBar";
 
@@ -12,7 +12,6 @@ export default function ImageCanvas() {
   const handleWheel = (event: React.WheelEvent) => {
     
     if (!event.ctrlKey || !currentImage) return
-    console.log(event);
     const delta = event.deltaY
     let zoomValue = currentImage.zoom * (delta < 0 ? 1.1 : 0.9)
     if (zoomValue < 1){
@@ -39,12 +38,23 @@ export default function ImageCanvas() {
 
   const handleScroll : React.UIEventHandler<HTMLDivElement> = (event) => {
     if (!currentImage) return
-    console.log(event.currentTarget.scrollLeft, event.currentTarget.scrollTop);
-    console.log(event.currentTarget.scrollWidth, event.currentTarget.scrollHeight);
-    console.log(event.currentTarget.clientWidth, event.currentTarget.clientHeight);
-    
-    updateImage({...currentImage, translation: { x: event.currentTarget.scrollLeft, y: event.currentTarget.scrollTop }})
+    updateImage( {
+        ...currentImage, 
+        translation: {
+           x: event.currentTarget.scrollLeft, 
+           y: event.currentTarget.scrollTop 
+          }
+      }
+    )
   }
+
+  useEffect(() => {
+    if (!currentImage) return
+    if (selfRef.current) {
+      selfRef.current.scrollLeft = currentImage.translation.x
+      selfRef.current.scrollTop = currentImage.translation.y
+    }
+  }, [currentImage?.path])
 
   return (
     <div ref={selfRef} className="flex-1 overflow-x-scroll overflow-y-scroll flex items-center justify-center m-1 relative select-none" onWheel={handleWheel} onScroll={handleScroll} >      
