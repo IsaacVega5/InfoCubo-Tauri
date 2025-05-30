@@ -51,16 +51,20 @@
   -ms-overflow-style: none;
 }
 *::-webkit-scrollbar {
-  height: .2rem;
+  height: 6px;
   width: 6px;
 }
 *::-webkit-scrollbar-track {
   border-radius: 0px;
-  background-color: #2f2f2f ;
+  background-color: transparent ;
 }
 *::-webkit-scrollbar-thumb {
   border-radius: 0px;
   background-color: #4b4b4b;
+  border-radius: 25px;
+}
+*::-webkit-scrollbar-corner {
+  background: rgba(0,0,0,0);
 }
 
 *::-webkit-scrollbar-thumb:hover {
