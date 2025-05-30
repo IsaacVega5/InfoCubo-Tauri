@@ -24,7 +24,7 @@ export default function LeftBar() {
       }
       const saved_image = getImageByPath(data.path)
       if (saved_image) {
-        updateImage({...saved_image, band: data.band, url: data.url, metadata: data.metadata, rotation: data.rotation})
+        updateImage({...saved_image, band: data.band, url: data.url, metadata: data.metadata, rotation: data.rotation, })
       }else{
         addImage({
           path: data.path,
@@ -32,10 +32,12 @@ export default function LeftBar() {
           url: data.url,
           metadata: data.metadata,
           rotation: 0,
-          size: data.size
+          size: data.size,
+          zoom: 1,
+          translation: { x: 0, y: 0 }
         });
       }
-      setCurrentImage(data)
+      setCurrentImage({...data, zoom: 1, translation: { x: 0, y: 0 }})
       removeProcess(wsEvents.READ_IMAGE)
     }
 

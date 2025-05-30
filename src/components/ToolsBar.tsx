@@ -3,8 +3,8 @@ import { HiColorSwatch } from "react-icons/hi";
 import { IoIosCut } from "react-icons/io";
 import { useImages } from "../hooks/useImages";
 import { useWebSocket } from "../hooks/useWebSocket";
-import CheckBtn from "../inputs/CheckBtn";
-import RotateInput from "../inputs/rotateInput";
+import CheckBtn from "./inputs/CheckBtn";
+import RotateInput from "./inputs/rotateInput";
 import useToolBar from "../hooks/useToolBar";
 import { startTransition } from "react";
 export default function ToolsBar() {

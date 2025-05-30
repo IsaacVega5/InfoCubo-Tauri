@@ -45,21 +45,24 @@ export default function DataGetHandler() {
     if (!bcr) return { container: null, image: null }
 
     const imgSize = { width: currentImage.size.width, height: currentImage.size.height}
-    const newSize = get_new_size({ imageSize: [imgSize.width, imgSize.height], newSize: [bcr.width, bcr.height] })
+    const newSize = get_new_size({ 
+      imageSize: [imgSize.width, imgSize.height], 
+      newSize: [bcr.width  * currentImage.zoom, bcr.height * currentImage.zoom] 
+    })
     
-    const container = { left: bcr.left, top: bcr.top, width: bcr.width, height: bcr.height }
+    const container = { left: bcr.left, top: bcr.top, width: bcr.width * currentImage.zoom, height: bcr.height * currentImage.zoom }
     const image = { width: newSize.width, height: newSize.height }
     return { container: container, image : image, ratio: newSize.ratio }
   }
 
   const setImageOffsetForPixels = () => {
     const { container, image, ratio } = getContainerAndImageSizes()
-    if (!container || !image) return
-    setImgOffSet({
-      left: (container.width - image.width) / 2,
-      top: (container.height - image.height) / 2,
-      ratio: ratio
-    }
+    if (!container || !image || !currentImage) return
+      setImgOffSet({
+        left: (container.width - image.width) / 2,
+        top: (container.height - image.height) / 2,
+        ratio: ratio
+      }
     )
   }
   useEffect(() => {
@@ -176,8 +179,14 @@ export default function DataGetHandler() {
 
   return (
 
-    <div ref={selfRef} className="h-full w-full absolute">
-      <div className="h-full w-full absolute top-0 left-0" onMouseDown={onPress}></div>
+    currentImage && <div ref={selfRef} className="h-full w-full absolute">
+      <div className="absolute top-0 left-0" 
+       onMouseDown={onPress}
+        style={{
+          width: getContainerAndImageSizes().container?.width,
+          height: getContainerAndImageSizes().container?.height
+        }}
+      ></div>
       <div className="h-full w-full">
         {
           (mouseState.Action === 'Move') && <SelectedArea position={mouseSelectedArea} />
@@ -220,6 +229,7 @@ export default function DataGetHandler() {
             })
           )
         }
+        </div>
         {
           currentDataList.length > 0 && (
             currentDataList.map((data: dataListElement) => (
@@ -245,7 +255,6 @@ export default function DataGetHandler() {
             ))
           )
         }
-      </div>
     </div>
   )
 }

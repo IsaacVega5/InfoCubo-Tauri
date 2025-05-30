@@ -22,6 +22,8 @@ export interface image {
   metadata: any;
   rotation: number;
   size: { width: number, height: number };
+  zoom: number;
+  translation: { x: number, y: number };
 } 
 interface ImagesProviderProps {
   children: React.ReactNode;
@@ -39,6 +41,8 @@ export function ImagesProvider({ children } : ImagesProviderProps) {
       if (prevImages.find((img) => img.path === newImage.path)) return prevImages;
       return [...prevImages, newImage];
     });
+    console.log(newImage);
+    
     setCurrentImage(newImage);
   };
   const removeImage = (path: string) => {
@@ -46,6 +50,7 @@ export function ImagesProvider({ children } : ImagesProviderProps) {
   }
   const updateImage = (updatedImage: image) => {
     setImage((prevImages) => prevImages.map((img) => img.path === updatedImage.path ? updatedImage : img));
+    if (updatedImage.path === currentImage?.path) setCurrentImage(updatedImage);
   }
   const clearImages = () => {
     setImage([]);
