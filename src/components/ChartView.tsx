@@ -151,7 +151,7 @@ export default function ChartView({ id, parentRef, title, dataList }: Props) {
   return (
     <div 
     ref={selfRef}
-      className="flex flex-col  h-64 w-96 absolute drop-shadow-md bg-custom-black"
+      className="flex flex-col  h-64 w-96 absolute drop-shadow-md bg-custom-black pointer-events-auto"
       style={{
         left : windowPos.x === null ? '50%' : `${windowPos.x}px`,
         top : windowPos.y === null ? '50%' : `${windowPos.y}px`,
