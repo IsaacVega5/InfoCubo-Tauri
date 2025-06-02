@@ -1,6 +1,7 @@
 import React, { lazy, useEffect, useRef  } from "react";
 import { useImages } from "../hooks/useImages"
 import useToolBar from "../hooks/useToolBar";
+import GraphViewGroup from "./ChartViewGroup";
 
 
 const DataGetHandler = lazy(() => import('./DataGetHandler'))
@@ -57,25 +58,28 @@ export default function ImageCanvas() {
   }, [currentImage?.path])
 
   return (
-    <div ref={selfRef} className="flex-1 overflow-x-scroll overflow-y-scroll flex items-center justify-center m-1 relative select-none" onWheel={handleWheel} onScroll={handleScroll} >      
-      {currentImage &&
-        <img
-          src={currentImage?.url || ''} 
-          alt="Imagen"
-          className="object-contain h-full w-full"
-          style={{
-            transform: `scale(${currentImage.zoom})`,
-            transformOrigin: "top left",
-            display: "block",
-            imageRendering: 'pixelated',
-          }}
-        />
-      }
-      { isPixelGetActivated(currentImage?.path || '') && <DataGetHandler />}
-      <div className="absolute bottom-2 right-2 flex flex-row gap-1"> 
-        {/* <button className="bg-black h-7 w-7 rounded-md" onClick={() => setZoom(zoom - 0.1)} >-</button>
-        <button className="bg-black h-7 w-7 rounded-md" onClick={() => setZoom(zoom + 0.1)}>+</button> */}
+    currentImage && <div className="flex-1 flex flex-col overflow-hidden relative">
+      <div ref={selfRef} className="flex-1 overflow-x-scroll overflow-y-scroll flex items-center justify-center m-1 relative select-none" onWheel={handleWheel} onScroll={handleScroll}
+        style={{
+          scrollbarGutter: "stable both-edges"
+        }}
+      >      
+        {currentImage &&
+          <img
+            src={currentImage?.url || ''} 
+            alt="Imagen"
+            className="object-contain h-full w-full"
+            style={{
+              transform: `scale(${currentImage.zoom})`,
+              transformOrigin: "top left",
+              display: "block",
+              imageRendering: 'pixelated',
+            }}
+          />
+        }
+        { isPixelGetActivated(currentImage?.path || '') && <DataGetHandler />}
       </div>
+      {isPixelGetActivated(currentImage?.path || '') && <GraphViewGroup />}
     </div>
   )
 }

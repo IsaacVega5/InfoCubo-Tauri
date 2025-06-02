@@ -41,7 +41,6 @@ export function ImagesProvider({ children } : ImagesProviderProps) {
       if (prevImages.find((img) => img.path === newImage.path)) return prevImages;
       return [...prevImages, newImage];
     });
-    console.log(newImage);
     
     setCurrentImage(newImage);
   };
