@@ -10,7 +10,7 @@ import { useLoader } from '../hooks/useLoader';
 
 export default function LeftBar() {
   const { sendMessage, subscribe, unsubscribe } = useWebSocket();
-  const { setCurrentImage, addImage, getImageByPath, updateImage } = useImages();
+  const { addImage, getImageByPath, updateImage, image } = useImages();
   const leftBar =useRef<HTMLDivElement>(null);
   const rightBorder = useRef<HTMLDivElement>(null);
   const { addProcess, removeProcess} = useLoader()
@@ -31,13 +31,12 @@ export default function LeftBar() {
           band: data.band,
           url: data.url,
           metadata: data.metadata,
-          rotation: 0,
+          rotation: data.rotation,
           size: data.size,
           zoom: 1,
           translation: { x: 0, y: 0 }
         });
       }
-      setCurrentImage({...data, zoom: 1, translation: { x: 0, y: 0 }})
       removeProcess(wsEvents.READ_IMAGE)
     }
 
@@ -46,7 +45,7 @@ export default function LeftBar() {
     return () => {
       unsubscribe(wsEvents.READ_IMAGE, handleImageResponse)
     }
-  }, [subscribe, unsubscribe]);
+  }, [subscribe, unsubscribe, image]);
 
   const handleNewImage = async () => {
     const paths = await open({

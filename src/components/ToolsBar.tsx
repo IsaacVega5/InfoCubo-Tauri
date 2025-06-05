@@ -48,7 +48,10 @@ export default function ToolsBar() {
 
   return (
     <div className="flex bg-custom-black flex-row rounded-md p-1 m-1 mb-0 gap-1">
-      <RotateInput disabled={currentImage === null || currentImage=== undefined} onChange={handleRotationChange} />
+      <RotateInput 
+        disabled={currentImage === null || currentImage=== undefined}
+        onChange={handleRotationChange}
+      />
       <CheckBtn label="RGB" disabled={currentImage === null || currentImage=== undefined} checked={currentImage?.band === 'RGB'} onChange={handleRGBChange}>
         <HiColorSwatch/>
       </CheckBtn>

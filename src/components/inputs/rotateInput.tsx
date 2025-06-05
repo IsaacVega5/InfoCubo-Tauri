@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MdOutlineRotateLeft, MdOutlineRotateRight } from "react-icons/md";
+import { useImages } from "../../hooks/useImages";
 
 interface Props {
   onChange?: (value: number) => void,
@@ -13,9 +14,14 @@ interface Props {
  */
 export default function RotateInput({onChange, disabled}: Props): JSX.Element {
   const [inputValue, setInputValue] = useState("0.00");
+  const {currentImage} = useImages()
   const regex = /^$|^[0-9]*\.?[0-9]{0,2}$/
   const disabledStyle = disabled ? 'opacity-50' : 'hover:brightness-125 hover:bg-custom-black';
   
+  useEffect(() => {
+    if (currentImage) setInputValue(currentImage.rotation.toFixed(2).toString());
+  }, [currentImage?.path]);
+
   useEffect(() => {
     if (onChange) {
       const input =  parseFloat(inputValue);
@@ -23,6 +29,7 @@ export default function RotateInput({onChange, disabled}: Props): JSX.Element {
       onChange(parseFloat(value.toFixed(2)));
     };
   }, [inputValue]);
+
 
   const evaluateInput = (value: string) =>{
     if (!regex.test(value)) {

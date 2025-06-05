@@ -65,7 +65,7 @@ export default function ImageCanvas() {
     if (!currentImage) return
     setImgError(true)
     updateImage({...currentImage, url: ''})
-    sendMessage(wsEvents.READ_IMAGE, { 'path': currentImage?.path || '', 'band': 'RGB', 'rotation': 0 })
+    sendMessage(wsEvents.READ_IMAGE, { 'path': currentImage?.path || '', 'band': 'RGB', 'rotation': currentImage.rotation })
   }
 
   useEffect(()=>{
