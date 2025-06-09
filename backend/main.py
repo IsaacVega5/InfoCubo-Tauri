@@ -1,9 +1,9 @@
-import asyncio
-import traceback
 import json
+import traceback
+
 from aiohttp import web
 from cache import image_cache
-from handlers import read_image, kill_app, read_image_pixel, read_image_area
+from handlers import kill_app, read_image, read_image_area, read_image_pixel
 
 app = web.Application()
 
@@ -39,7 +39,7 @@ async def websocket_handler(request):
         args = json_data.get('args')
         handler = event_handlers.get(fcn)
         if handler:
-          response = await handler(*args.values(), request)
+          response = await handler(*args.values(), request = request)
           await ws.send_json({
             'fcn': fcn,
             'response': response,

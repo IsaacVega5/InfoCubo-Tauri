@@ -6,6 +6,7 @@ import { WebSocketProvider } from "./context/WebSocketContext";
 import { ImagesProvider } from "./context/ImagesContext";
 import { LoaderProvider } from "./context/LoaderContext";
 import { ToolsBarProvider } from "./context/ToolsBarContext";
+import { DisplayImagesProvider } from "./context/DisplayImageContex";
 
 async function execute_binary() {
   const command = Command.sidecar('../backend/dist/infocubo-backend');
@@ -14,13 +15,15 @@ async function execute_binary() {
 execute_binary();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <ToolsBarProvider>
-    <LoaderProvider>
-        <ImagesProvider>
-          <WebSocketProvider url="ws://localhost:8765/ws">
-            <App />
-          </WebSocketProvider>
-        </ImagesProvider>
-    </LoaderProvider>
-  </ToolsBarProvider>
+  <DisplayImagesProvider>
+    <ToolsBarProvider>
+      <LoaderProvider>
+          <ImagesProvider>
+            <WebSocketProvider url="ws://localhost:8765/ws">
+              <App />
+            </WebSocketProvider>
+          </ImagesProvider>
+      </LoaderProvider>
+    </ToolsBarProvider>
+  </DisplayImagesProvider>
 );

@@ -6,12 +6,14 @@ import { useWebSocket } from "../hooks/useWebSocket";
 import CheckBtn from "./inputs/CheckBtn";
 import RotateInput from "./inputs/rotateInput";
 import useToolBar from "../hooks/useToolBar";
-import { startTransition } from "react";
+import { startTransition, useState } from "react";
+import { useDisplayImage } from "../hooks/useDisplayImage";
 export default function ToolsBar() {
   const { currentImage } = useImages()
   const { sendMessage } = useWebSocket()
+  const { displayRef } = useDisplayImage()
   const { activatePixelGet,deactivatePixelGet, removeDataFromPath, isPixelGetActivated } = useToolBar()
-
+  
   const handleRGBChange = (value: boolean) => {
     if (!currentImage) return
     sendMessage('read_image', {
@@ -20,17 +22,30 @@ export default function ToolsBar() {
       'rotation': currentImage.rotation
     });
   }
-
+  
+  const [sendMessageTimeout, setSendMessageTimeout] = useState<null | number>(null);
   const handleRotationChange = (value: number) => {
-    const sendMessageRotation = setTimeout(() => {
-      if (!currentImage) return
+    if (!currentImage) return
+    const core = setTimeout(() => {
       sendMessage('read_image', {
         'path': currentImage.path,
         'band': currentImage.band,
         'rotation': value,
+        'display_size': [displayRef.current!.scrollWidth, displayRef.current!.scrollHeight]
       });
-    }, 500)
-    return () => clearTimeout(sendMessageRotation)
+    }, 500);
+    const messageAfter = setTimeout(() => {
+      sendMessage('read_image', {
+        'path': currentImage.path,
+        'band': currentImage.band,
+        'rotation': value
+      })
+    }, 2000)
+    if (sendMessageTimeout) {
+      clearTimeout(sendMessageTimeout);
+    }
+    setSendMessageTimeout(messageAfter);
+    return () => clearTimeout(core);
   }
 
   const handlePixelGetActivateClick = (value: boolean) => {
