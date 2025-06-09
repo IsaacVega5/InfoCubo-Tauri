@@ -44,7 +44,7 @@ function handleOnMouseUp() {
   }
 }
 
-function handleOnTouchStart(event: React.TouchEvent<HTMLElement>) {
+function handleOnTouchStart() {
   // Necesitarías adaptar esto para eventos táctiles
   const mouseEvent = {} as React.MouseEvent<HTMLElement>;
   startPressTimer(mouseEvent);

@@ -1,21 +1,22 @@
-import React, { lazy, useEffect, useRef, useState  } from "react";
+import React, { lazy, useEffect, useState  } from "react";
 import { useImages } from "../hooks/useImages"
 import useToolBar from "../hooks/useToolBar";
 import GraphViewGroup from "./ChartViewGroup";
 import { useWebSocket } from "../hooks/useWebSocket";
 import { wsEvents } from "../constants/wsEvents";
+import { useDisplayImage } from "../hooks/useDisplayImage";
 
 
 const DataGetHandler = lazy(() => import('./DataGetHandler'))
 export default function ImageCanvas() {
   const { currentImage, updateImage } = useImages()
+  const { displayRef } = useDisplayImage()
   const { isPixelGetActivated} = useToolBar()
   const { sendMessage } = useWebSocket()
-  const selfRef = useRef<HTMLDivElement>(null)
   const [imgError, setImgError] = useState(false)
   
+
   const handleWheel = (event: React.WheelEvent) => {
-    
     if (!event.ctrlKey || !currentImage) return
     const delta = event.deltaY
     let zoomValue = currentImage.zoom * (delta < 0 ? 1.1 : 0.9)
@@ -25,16 +26,16 @@ export default function ImageCanvas() {
     let prevZoom = currentImage.zoom
     let newZoom = zoomValue
     
-    const bcr = selfRef.current?.getBoundingClientRect()
+    const bcr = displayRef.current?.getBoundingClientRect()
     if (!bcr) return
-    const mouseX = event.clientX - bcr.left + selfRef.current!.scrollLeft;
-    const mouseY = event.clientY - bcr.top + selfRef.current!.scrollTop;
+    const mouseX = event.clientX - bcr.left + displayRef.current!.scrollLeft;
+    const mouseY = event.clientY - bcr.top + displayRef.current!.scrollTop;
     
     setTimeout(() => {
-      if (selfRef.current) {
-        selfRef.current.scrollLeft =
+      if (displayRef.current) {
+        displayRef.current.scrollLeft =
         ( mouseX * newZoom) / prevZoom - (event.clientX - bcr.left);
-        selfRef.current.scrollTop =
+        displayRef.current.scrollTop =
         (mouseY * newZoom) / prevZoom - (event.clientY - bcr.top);
       }
     }, 0);
@@ -55,9 +56,9 @@ export default function ImageCanvas() {
 
   useEffect(() => {
     if (!currentImage) return
-    if (selfRef.current) {
-      selfRef.current.scrollLeft = currentImage.translation.x
-      selfRef.current.scrollTop = currentImage.translation.y
+    if (displayRef.current) {
+      displayRef.current.scrollLeft = currentImage.translation.x
+      displayRef.current.scrollTop = currentImage.translation.y
     }
   }, [currentImage?.path])
 
@@ -75,7 +76,7 @@ export default function ImageCanvas() {
 
   return (
     currentImage && <div className="flex-1 flex flex-col overflow-hidden relative">
-      <div ref={selfRef} className="flex-1 overflow-x-scroll overflow-y-scroll flex items-center justify-center m-1 relative select-none" onWheel={handleWheel} onScroll={handleScroll}
+      <div ref={displayRef} className="flex-1 overflow-x-scroll overflow-y-scroll flex items-center justify-center m-1 relative select-none" onWheel={handleWheel} onScroll={handleScroll}
         style={{
           scrollbarGutter: "stable both-edges"
         }}

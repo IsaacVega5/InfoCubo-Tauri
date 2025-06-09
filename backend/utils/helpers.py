@@ -1,5 +1,6 @@
 import math
 
+
 def concat_list(list):
   string = ""
   for i in list:
@@ -22,9 +23,9 @@ def cut_points_to_array(cut_points):
   return points
 
 
-def get_new_size(image, ancho, alto):
-  o_alto, o_ancho = image.shape
-  n_alto, n_ancho = alto, ancho
+def get_new_size(image, container):
+  o_alto, o_ancho = image
+  n_alto, n_ancho = container
   
   resize_ratio = min(n_alto/o_alto, n_ancho/o_ancho)
   new_width = int(o_ancho * resize_ratio)
@@ -39,7 +40,8 @@ def get_metadata(path):
   past_key = ''
   for line in lines:
     line = line.strip()
-    if line == 'ENVI': continue
+    if line == 'ENVI': 
+      continue
     if '=' in line:
       list_line = line.split('=')
       key = list_line[0].strip()

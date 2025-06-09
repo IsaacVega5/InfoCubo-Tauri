@@ -5,10 +5,10 @@ from cache import image_cache
 from spectral import get_rgb
 
 import utils.transformation as tf
-from utils.helpers import get_metadata
+from utils.helpers import get_metadata, get_new_size
 
 
-async def read_image(path, band = 0, rotation = 0,request = None):
+async def read_image(path, band = 0, rotation = 0, display_size = None, request = None):
   metadata = get_metadata(path)
   
   image = envi.open(path, path.replace('.hdr', ''))
@@ -27,6 +27,14 @@ async def read_image(path, band = 0, rotation = 0,request = None):
       'error': 'Error reading image'
     }
   
+  size = image.shape
+  if display_size:
+    new_size = get_new_size(
+      [image.shape[1], image.shape[0]], 
+      [display_size[1], display_size[0]]
+    )
+    image = cv2.resize(image, (new_size[1], new_size[0]))
+  
   image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
   if band == 'RGB':
     image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_BGR2RGB)
@@ -34,7 +42,10 @@ async def read_image(path, band = 0, rotation = 0,request = None):
   if rotation != 0:
     image = tf.rotate_matrix(image, float(rotation) *-1)
   
-  image_id = str(path.replace('\\', '/').split('/')[-1].split('.')[0] + "&band=" + str(band) + "&rotation=" + str(rotation))
+  image_id = str(path.replace('\\', '/').split('/')[-1].split('.')[0]\
+    + "&band=" + str(band)\
+    + "&rotation=" + str(rotation))\
+    + "&display_size=" + str(display_size)
   
   # clean cache
   cache_keys = list(image_cache.keys())
@@ -52,8 +63,8 @@ async def read_image(path, band = 0, rotation = 0,request = None):
     'rotation': rotation,
     'metadata': metadata,
     'size': {
-      'width': image.shape[1],
-      'height': image.shape[0]
+      'width': size[1],
+      'height': size[0]
     }
   }
   
