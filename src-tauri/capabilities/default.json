@@ -13,7 +13,13 @@
       "allow": [
         {
           "name": "../backend/dist/infocubo-backend",
-          "sidecar": true
+          "sidecar": true,
+          "args":[
+            "--port",
+            {
+              "validator": "\\d+"
+            }
+          ]
         }
       ]
     },

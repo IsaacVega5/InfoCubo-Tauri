@@ -1,3 +1,4 @@
+import argparse
 import json
 import traceback
 
@@ -5,6 +6,7 @@ from aiohttp import web
 from cache import image_cache
 from handlers import kill_app, read_image, read_image_area, read_image_pixel
 
+# def main():
 app = web.Application()
 
 routes = web.RouteTableDef()
@@ -61,4 +63,18 @@ async def websocket_handler(request):
 app.add_routes(routes)
 app.router.add_get('/ws', websocket_handler)
 
-web.run_app(app, port=8765)
+parser = argparse.ArgumentParser()
+parser.add_argument('--port', type=int)
+args = parser.parse_args()
+  
+if args.port:
+  port = args.port
+else:
+  port = 8765
+
+
+web.run_app(app, port=port)
+
+
+# if __name__ == "__main__":
+#   main()
